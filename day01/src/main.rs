@@ -6,7 +6,10 @@ mod matching;
 use matching::{find_matching_sum, find_matching_sum_of_three, find_matching_sum_of_two};
 
 fn main() {
-    let numbers: Vec<u32> = read_lines("./data/input").unwrap().map(to_number).collect();
+    let numbers: Vec<u32> = read_lines("../data/input")
+        .unwrap()
+        .map(to_number)
+        .collect();
 
     solve_part_one(&numbers);
     solve_part_two(&numbers);
