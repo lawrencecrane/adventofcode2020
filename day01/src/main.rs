@@ -50,24 +50,14 @@ where
     found_sum
 }
 
-fn _find_matching_sum_of_three(xs: &Vec<u32>, n: &u32, sum: u32) -> Option<(u32, u32, u32)> {
-    let (_, matching) =
-        xs.iter().fold(
-            (Vec::new(), None),
-            |(mut numbers, previous_sum), x| match previous_sum {
-                Some(_) => (numbers, previous_sum),
-                None => {
-                    let matching = _find_matching_sum(&numbers, &(x + n), sum)
-                        .and_then(|(a, _)| Some((a, *x, *n)));
-
-                    numbers.push(*x);
-
-                    (numbers, matching)
-                }
-            },
-        );
-
-    matching
+fn _find_matching_sum_of_three(
+    numbers: &Vec<u32>,
+    number: &u32,
+    sum: u32,
+) -> Option<(u32, u32, u32)> {
+    find_matching_sum(numbers.clone().into_iter(), sum, &|xs, x, _| {
+        _find_matching_sum(xs, &(number + x), sum).and_then(|(a, _)| Some((a, *x, *number)))
+    })
 }
 
 fn _find_matching_sum(xs: &Vec<u32>, n: &u32, sum: u32) -> Option<(u32, u32)> {
