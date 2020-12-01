@@ -4,31 +4,25 @@ use std::iter::Iterator;
 use std::path::Path;
 
 fn main() {
+    solve_part_one();
+    solve_part_two();
+}
+
+fn solve_part_one() {
     let lines = read_lines("./data/input").unwrap();
 
     let (a, b) = find_matching_sum(lines.map(to_number), 2020, &_find_matching_sum).unwrap();
 
-    println!("{} and {}, answer: {}", a, b, a * b);
+    println!("PART 1: {} and {}, answer: {}", a, b, a * b);
 }
 
-fn _find_matching_sum_of_three(xs: &Vec<u32>, n: &u32, sum: u32) -> Option<(u32, u32, u32)> {
-    let (_, matching) =
-        xs.iter().fold(
-            (Vec::new(), None),
-            |(mut numbers, previous_sum), x| match previous_sum {
-                Some(_) => (numbers, previous_sum),
-                None => {
-                    let matching = _find_matching_sum(&numbers, &(x + n), sum)
-                        .and_then(|(a, _)| Some((a, *x, *n)));
+fn solve_part_two() {
+    let lines = read_lines("./data/input").unwrap();
 
-                    numbers.push(*x);
+    let (a, b, c) =
+        find_matching_sum(lines.map(to_number), 2020, &_find_matching_sum_of_three).unwrap();
 
-                    (numbers, matching)
-                }
-            },
-        );
-
-    matching
+    println!("PART 2: {}, {} and {}, answer: {}", a, b, c, a * b * c);
 }
 
 fn find_matching_sum<I, T>(
@@ -54,6 +48,26 @@ where
         );
 
     found_sum
+}
+
+fn _find_matching_sum_of_three(xs: &Vec<u32>, n: &u32, sum: u32) -> Option<(u32, u32, u32)> {
+    let (_, matching) =
+        xs.iter().fold(
+            (Vec::new(), None),
+            |(mut numbers, previous_sum), x| match previous_sum {
+                Some(_) => (numbers, previous_sum),
+                None => {
+                    let matching = _find_matching_sum(&numbers, &(x + n), sum)
+                        .and_then(|(a, _)| Some((a, *x, *n)));
+
+                    numbers.push(*x);
+
+                    (numbers, matching)
+                }
+            },
+        );
+
+    matching
 }
 
 fn _find_matching_sum(xs: &Vec<u32>, n: &u32, sum: u32) -> Option<(u32, u32)> {
