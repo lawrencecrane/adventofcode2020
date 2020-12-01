@@ -33,19 +33,15 @@ fn find_matching_sum<I, T>(
 where
     I: Iterator<Item = u32>,
 {
-    let (_, matching) =
-        numbers.fold(
-            (Vec::new(), None),
-            |(mut xs, previous_sum), x| match previous_sum {
-                Some(_) => (xs, previous_sum),
-                None => {
-                    let sum = finder(&xs, &x, sum);
-                    xs.push(x);
+    let (_, matching) = numbers.fold((Vec::new(), None), |(mut xs, matching), x| match matching {
+        Some(_) => (xs, matching),
+        None => {
+            let sum = finder(&xs, &x, sum);
+            xs.push(x);
 
-                    (xs, sum)
-                }
-            },
-        );
+            (xs, sum)
+        }
+    });
 
     matching
 }
