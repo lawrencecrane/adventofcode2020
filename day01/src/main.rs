@@ -33,21 +33,21 @@ fn find_matching_sum<I, T>(
 where
     I: Iterator<Item = u32>,
 {
-    let (_, found_sum) =
+    let (_, matching) =
         numbers.fold(
             (Vec::new(), None),
-            |(mut numbers, previous_sum), x| match previous_sum {
-                Some(_) => (numbers, previous_sum),
+            |(mut xs, previous_sum), x| match previous_sum {
+                Some(_) => (xs, previous_sum),
                 None => {
-                    let sum = finder(&numbers, &x, sum);
-                    numbers.push(x);
+                    let sum = finder(&xs, &x, sum);
+                    xs.push(x);
 
-                    (numbers, sum)
+                    (xs, sum)
                 }
             },
         );
 
-    found_sum
+    matching
 }
 
 fn _find_matching_sum_of_three(
