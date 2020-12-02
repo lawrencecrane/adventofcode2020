@@ -16,9 +16,7 @@ pub fn check_position_policy(password: &Password) -> bool {
     let snd = password.value.chars().nth(password.policy.max - 1);
 
     match (fst, snd) {
-        (Some(a), Some(b)) => {
-            (a == password.policy.value) as i32 + (b == password.policy.value) as i32 == 1
-        }
+        (Some(a), Some(b)) => (a == password.policy.value) ^ (b == password.policy.value),
         _ => false,
     }
 }
