@@ -6,7 +6,7 @@ mod matching;
 use matching::{find_matching_sum, find_matching_sum_of_three, find_matching_sum_of_two};
 
 fn main() {
-    let numbers: Vec<u32> = read_lines("../data/input")
+    let numbers: Vec<u32> = read_lines("../data/01_input")
         .unwrap()
         .map(to_number)
         .collect();
