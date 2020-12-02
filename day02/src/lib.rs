@@ -1,7 +1,26 @@
 use std::iter::Iterator;
 
+pub fn n_valid_passwords_by_position_policy(passwords: &Vec<Password>) -> usize {
+    passwords
+        .iter()
+        .filter(|pw| check_position_policy(pw))
+        .count()
+}
+
 pub fn n_valid_passwords_by_count_policy(passwords: &Vec<Password>) -> usize {
     passwords.iter().filter(|pw| check_count_policy(pw)).count()
+}
+
+pub fn check_position_policy(password: &Password) -> bool {
+    let fst = password.value.chars().nth(password.policy.min - 1);
+    let snd = password.value.chars().nth(password.policy.max - 1);
+
+    match (fst, snd) {
+        (Some(a), Some(b)) => {
+            (a == password.policy.value) as i32 + (b == password.policy.value) as i32 == 1
+        }
+        _ => false,
+    }
 }
 
 pub fn check_count_policy(password: &Password) -> bool {
@@ -60,11 +79,13 @@ pub fn to_policy(policy: &str) -> Option<Policy> {
     }
 }
 
+#[derive(Debug)]
 pub struct Password {
     pub policy: Policy,
     pub value: String,
 }
 
+#[derive(Debug)]
 pub struct Policy {
     pub min: usize,
     pub max: usize,
@@ -82,5 +103,16 @@ mod tests {
         );
 
         assert_eq!(super::n_valid_passwords_by_count_policy(&passwords), 2)
+    }
+
+    #[test]
+    fn n_valid_passwords_by_position_policy_test() {
+        let passwords = super::to_passwords(
+            vec!["1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"]
+                .iter()
+                .map(|s| s.to_string()),
+        );
+
+        assert_eq!(super::n_valid_passwords_by_position_policy(&passwords), 1)
     }
 }
