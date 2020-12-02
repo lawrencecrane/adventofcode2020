@@ -1,10 +1,10 @@
 use std::iter::Iterator;
 
-pub fn n_valid_passwords(passwords: &Vec<Password>) -> usize {
-    passwords.iter().filter(|pw| is_valid_password(pw)).count()
+pub fn n_valid_passwords_by_count_policy(passwords: &Vec<Password>) -> usize {
+    passwords.iter().filter(|pw| check_count_policy(pw)).count()
 }
 
-fn is_valid_password(password: &Password) -> bool {
+pub fn check_count_policy(password: &Password) -> bool {
     let count = password
         .value
         .chars()
@@ -74,13 +74,13 @@ pub struct Policy {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn find_valid_passwords_test() {
+    fn n_valid_passwords_by_count_policy_test() {
         let passwords = super::to_passwords(
             vec!["1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"]
                 .iter()
                 .map(|s| s.to_string()),
         );
 
-        assert_eq!(super::n_valid_passwords(&passwords), 2)
+        assert_eq!(super::n_valid_passwords_by_count_policy(&passwords), 2)
     }
 }
