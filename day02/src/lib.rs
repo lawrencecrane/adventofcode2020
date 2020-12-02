@@ -1,7 +1,17 @@
 use std::iter::Iterator;
 
 pub fn n_valid_passwords(passwords: &Vec<Password>) -> usize {
-    passwords.len()
+    passwords.iter().filter(|pw| is_valid_password(pw)).count()
+}
+
+fn is_valid_password(password: &Password) -> bool {
+    let count = password
+        .value
+        .chars()
+        .filter(|c| c == &password.policy.value)
+        .count();
+
+    count >= password.policy.min && count <= password.policy.max
 }
 
 pub fn to_passwords<I>(passwords: I) -> Vec<Password>
@@ -17,20 +27,48 @@ where
 
 pub fn to_password(password: String) -> Option<Password> {
     let mut s = password.split(": ");
-    let (policy, password) = (s.next(), s.next());
 
-    match (policy, password) {
-        (Some(policy), Some(password)) => Some(Password {
-            policy: String::from(policy),
-            value: String::from(password),
-        }),
+    match (s.next(), s.next()) {
+        (Some(policy), Some(password)) => match to_policy(policy) {
+            Some(policy) => Some(Password {
+                policy,
+                value: String::from(password),
+            }),
+            _ => None,
+        },
+        _ => None,
+    }
+}
+
+pub fn to_policy(policy: &str) -> Option<Policy> {
+    let mut s = policy.split_whitespace();
+
+    match (s.next(), s.next()) {
+        (Some(minmax), Some(letter)) => {
+            let mut ss = minmax.split('-');
+
+            match (ss.next(), ss.next()) {
+                (Some(min), Some(max)) => Some(Policy {
+                    min: min.parse().unwrap(),
+                    max: max.parse().unwrap(),
+                    value: letter.chars().nth(0).unwrap(),
+                }),
+                _ => None,
+            }
+        }
         _ => None,
     }
 }
 
 pub struct Password {
-    pub policy: String,
+    pub policy: Policy,
     pub value: String,
+}
+
+pub struct Policy {
+    pub min: usize,
+    pub max: usize,
+    pub value: char,
 }
 
 #[cfg(test)]
