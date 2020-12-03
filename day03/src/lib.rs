@@ -1,9 +1,9 @@
-pub fn traverse_and_count_trees(world: World) -> usize {
-    _traverse_and_count_trees(world, 0)
+pub fn traverse_and_count_trees(world: World, slope: Coordinate) -> usize {
+    _traverse_and_count_trees(world, slope, 0)
 }
 
-fn _traverse_and_count_trees(world: World, ntrees: usize) -> usize {
-    match travel(&world, Coordinate { x: 3, y: 1 }) {
+fn _traverse_and_count_trees(world: World, slope: Coordinate, ntrees: usize) -> usize {
+    match travel(&world, &slope) {
         None => ntrees,
         Some(position) => {
             let w = World {
@@ -13,12 +13,12 @@ fn _traverse_and_count_trees(world: World, ntrees: usize) -> usize {
 
             let found_tree = encountered_tree(&w);
 
-            _traverse_and_count_trees(w, ntrees + found_tree as usize)
+            _traverse_and_count_trees(w, slope, ntrees + found_tree as usize)
         }
     }
 }
 
-fn travel(world: &World, slope: Coordinate) -> Option<Coordinate> {
+fn travel(world: &World, slope: &Coordinate) -> Option<Coordinate> {
     let x = (world.position.x + slope.x) % world.map[0].len();
     let y = world.position.y + slope.y;
 
@@ -67,10 +67,13 @@ mod tests {
         .collect();
 
         assert_eq!(
-            super::traverse_and_count_trees(super::World {
-                map: &map,
-                position: super::Coordinate { x: 0, y: 0 }
-            }),
+            super::traverse_and_count_trees(
+                super::World {
+                    map: &map,
+                    position: super::Coordinate { x: 0, y: 0 }
+                },
+                super::Coordinate { x: 3, y: 1 }
+            ),
             7
         );
     }
