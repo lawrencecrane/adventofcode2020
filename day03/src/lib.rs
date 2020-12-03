@@ -1,17 +1,42 @@
-pub fn traverse_and_count_trees(world: &World) -> usize {
-    0
+pub fn traverse_and_count_trees(world: World) -> usize {
+    _traverse_and_count_trees(world, 0)
 }
 
-fn travel(world: &World, slope: Coordinate) -> Coordinate {
-    Coordinate { x: 0, y: 0 }
+fn _traverse_and_count_trees(world: World, ntrees: usize) -> usize {
+    match travel(&world, Coordinate { x: 3, y: 1 }) {
+        None => ntrees,
+        Some(position) => {
+            let w = World {
+                map: world.map,
+                position,
+            };
+
+            let found_tree = encountered_tree(&w);
+
+            _traverse_and_count_trees(w, ntrees + found_tree as usize)
+        }
+    }
+}
+
+fn travel(world: &World, slope: Coordinate) -> Option<Coordinate> {
+    let x = (world.position.x + slope.x) % world.map[0].len();
+    let y = world.position.y + slope.y;
+
+    match y < world.map.len() {
+        true => Some(Coordinate { x, y }),
+        false => None,
+    }
 }
 
 fn encountered_tree(world: &World) -> bool {
-    false
+    world.map[world.position.y]
+        .chars()
+        .nth(world.position.x)
+        .map_or(false, |c| c == '#')
 }
 
-pub struct World {
-    pub map: Vec<String>,
+pub struct World<'a> {
+    pub map: &'a Vec<String>,
     pub position: Coordinate,
 }
 
@@ -23,5 +48,30 @@ pub struct Coordinate {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn test() {}
+    fn test_traverse_and_count_trees() {
+        let map: Vec<String> = vec![
+            "..##.......",
+            "#...#...#..",
+            ".#....#..#.",
+            "..#.#...#.#",
+            ".#...##..#.",
+            "..#.##.....",
+            ".#.#.#....#",
+            ".#........#",
+            "#.##...#...",
+            "#...##....#",
+            ".#..#...#.#",
+        ]
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+
+        assert_eq!(
+            super::traverse_and_count_trees(super::World {
+                map: &map,
+                position: super::Coordinate { x: 0, y: 0 }
+            }),
+            7
+        );
+    }
 }

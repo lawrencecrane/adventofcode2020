@@ -12,8 +12,8 @@ fn main() {
 
     println!(
         "PART 1 | encoutered trees: {}",
-        traverse_and_count_trees(&World {
-            map,
+        traverse_and_count_trees(World {
+            map: &map,
             position: Coordinate { x: 0, y: 0 }
         })
     )
