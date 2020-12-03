@@ -1,8 +1,11 @@
-pub fn traverse_and_count_trees(world: World, slope: Coordinate) -> usize {
-    _traverse_and_count_trees(world, slope, 0)
+pub fn traverse_and_count_trees(world: &World, slopes: Vec<Coordinate>) -> Vec<usize> {
+    slopes
+        .iter()
+        .map(|slope| _traverse_and_count_trees(world, slope, 0))
+        .collect()
 }
 
-fn _traverse_and_count_trees(world: World, slope: Coordinate, ntrees: usize) -> usize {
+fn _traverse_and_count_trees(world: &World, slope: &Coordinate, ntrees: usize) -> usize {
     match travel(&world, &slope) {
         None => ntrees,
         Some(position) => {
@@ -13,7 +16,7 @@ fn _traverse_and_count_trees(world: World, slope: Coordinate, ntrees: usize) -> 
 
             let found_tree = encountered_tree(&w);
 
-            _traverse_and_count_trees(w, slope, ntrees + found_tree as usize)
+            _traverse_and_count_trees(&w, slope, ntrees + found_tree as usize)
         }
     }
 }
@@ -47,9 +50,8 @@ pub struct Coordinate {
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn test_traverse_and_count_trees() {
-        let map: Vec<String> = vec![
+    fn create_factory() -> Vec<String> {
+        vec![
             "..##.......",
             "#...#...#..",
             ".#....#..#.",
@@ -64,16 +66,20 @@ mod tests {
         ]
         .iter()
         .map(|s| s.to_string())
-        .collect();
+        .collect()
+    }
+
+    #[test]
+    fn test_traverse_and_count_trees() {
+        let map = create_factory();
+
+        let world = super::World {
+            map: &map,
+            position: super::Coordinate { x: 0, y: 0 },
+        };
 
         assert_eq!(
-            super::traverse_and_count_trees(
-                super::World {
-                    map: &map,
-                    position: super::Coordinate { x: 0, y: 0 }
-                },
-                super::Coordinate { x: 3, y: 1 }
-            ),
+            super::traverse_and_count_trees(&world, vec![super::Coordinate { x: 3, y: 1 }])[0],
             7
         );
     }

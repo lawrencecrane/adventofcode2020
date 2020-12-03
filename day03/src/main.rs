@@ -10,14 +10,13 @@ fn main() {
         .map(|s| s.unwrap())
         .collect();
 
+    let world = World {
+        map: &map,
+        position: Coordinate { x: 0, y: 0 },
+    };
+
     println!(
         "PART 1 | encoutered trees: {}",
-        traverse_and_count_trees(
-            World {
-                map: &map,
-                position: Coordinate { x: 0, y: 0 }
-            },
-            Coordinate { x: 3, y: 1 }
-        )
+        traverse_and_count_trees(&world, vec![Coordinate { x: 3, y: 1 }])[0]
     )
 }
