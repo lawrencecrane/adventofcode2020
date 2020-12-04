@@ -7,5 +7,8 @@ use lib::*;
 fn main() {
     let passports = to_passports(read_lines("../data/04_input").unwrap().map(|s| s.unwrap()));
 
-    println!("{:?}", passports);
+    println!(
+        "PART 1 | number of valid passports: {}",
+        n_valid(&passports)
+    );
 }

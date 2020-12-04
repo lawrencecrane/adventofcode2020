@@ -2,7 +2,12 @@ use std::collections::HashMap;
 use std::iter::Iterator;
 
 pub fn n_valid(passports: &Vec<HashMap<String, String>>) -> usize {
-    0
+    let keys = vec!["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
+
+    passports
+        .iter()
+        .filter(|passport| keys.iter().all(|key| passport.contains_key(*key)))
+        .count()
 }
 
 pub fn to_passports<I>(passports: I) -> Vec<HashMap<String, String>>
