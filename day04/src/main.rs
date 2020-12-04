@@ -5,8 +5,7 @@ mod lib;
 use lib::*;
 
 fn main() {
-    let map: Vec<String> = read_lines("../data/04_input")
-        .unwrap()
-        .map(|s| s.unwrap())
-        .collect();
+    let passports = to_passports(read_lines("../data/04_input").unwrap().map(|s| s.unwrap()));
+
+    println!("{:?}", passports);
 }
