@@ -14,7 +14,7 @@ pub fn to_passports<I>(passports: I) -> Vec<HashMap<String, String>>
 where
     I: Iterator<Item = String>,
 {
-    let (passports, _) = passports.fold(
+    let (mut passports, last) = passports.fold(
         (Vec::new(), Vec::new()),
         |(mut passports, mut current_passport), line| {
             let mut data: Vec<String> = line
@@ -37,6 +37,8 @@ where
             }
         },
     );
+
+    passports.push(last);
 
     passports.iter().map(to_passport).collect()
 }
