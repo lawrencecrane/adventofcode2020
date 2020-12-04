@@ -8,3 +8,7 @@ edition = "2018"
 
 [dependencies.aoc-utils]
 path = "../aoc-utils"
+
+[dependencies]
+regex = "1"
+lazy_static = "1.4.0"

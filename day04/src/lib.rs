@@ -1,16 +1,63 @@
+use lazy_static::lazy_static;
+use regex::Regex;
 use std::collections::HashMap;
 use std::iter::Iterator;
+use std::str::FromStr;
 
-pub fn n_valid(passports: &Vec<HashMap<String, String>>) -> usize {
-    let keys = vec!["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
+lazy_static! {
+    static ref HEX_REGEX: Regex = Regex::new("^#[0-9a-f]{6}$").unwrap();
+}
 
+pub fn n_valid_keys_and_values(passports: &Vec<HashMap<PasswordField, String>>) -> usize {
     passports
         .iter()
-        .filter(|passport| keys.iter().all(|key| passport.contains_key(*key)))
+        .filter(|passport| {
+            NON_OPTIONAL_KEYS.iter().all(|key| {
+                passport
+                    .get(key)
+                    .map_or(false, |value| has_valid_value(key, value))
+            })
+        })
         .count()
 }
 
-pub fn to_passports<I>(passports: I) -> Vec<HashMap<String, String>>
+pub fn n_valid_keys(passports: &Vec<HashMap<PasswordField, String>>) -> usize {
+    passports
+        .iter()
+        .filter(|passport| {
+            NON_OPTIONAL_KEYS
+                .iter()
+                .all(|key| passport.contains_key(key))
+        })
+        .count()
+}
+
+fn has_valid_value(field: &PasswordField, value: &String) -> bool {
+    match field {
+        PasswordField::BYR => parse_number_and(value, |x| x >= 1920 && x <= 2002),
+        PasswordField::IYR => parse_number_and(value, |x| x >= 2010 && x <= 2020),
+        PasswordField::EYR => parse_number_and(value, |x| x >= 2020 && x <= 2030),
+        PasswordField::HGT => is_valid_height(value),
+        PasswordField::HCL => HEX_REGEX.is_match(value),
+        PasswordField::ECL => EYE_COLORS.contains(&value.as_str()),
+        PasswordField::PID => value.len() == 9 && value.chars().all(|c| c.is_numeric()),
+        PasswordField::CID => true,
+    }
+}
+
+fn is_valid_height(height: &String) -> bool {
+    match (height.split("cm").next(), height.split("in").next()) {
+        (Some(cm), _) => parse_number_and(&cm.to_string(), |x| x >= 150 && x <= 193),
+        (_, Some(inch)) => parse_number_and(&inch.to_string(), |x| x >= 59 && x <= 76),
+        _ => false,
+    }
+}
+
+fn parse_number_and<F: FnOnce(u32) -> bool>(value: &String, f: F) -> bool {
+    value.parse::<u32>().map_or(false, f)
+}
+
+pub fn to_passports<I>(passports: I) -> Vec<HashMap<PasswordField, String>>
 where
     I: Iterator<Item = String>,
 {
@@ -43,19 +90,61 @@ where
     passports.iter().map(to_passport).collect()
 }
 
-fn to_passport(passport: &Vec<String>) -> HashMap<String, String> {
+fn to_passport(passport: &Vec<String>) -> HashMap<PasswordField, String> {
     passport.iter().fold(HashMap::new(), |mut map, field| {
         let mut data = field.split(':');
 
         match (data.next(), data.next()) {
             (Some(key), Some(value)) => {
-                map.insert(key.to_string(), value.to_string());
+                map.insert(PasswordField::from_str(key).unwrap(), value.to_string());
             }
             _ => {}
         };
 
         map
     })
+}
+
+const EYE_COLORS: [&str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
+
+const NON_OPTIONAL_KEYS: [PasswordField; 7] = [
+    PasswordField::BYR,
+    PasswordField::IYR,
+    PasswordField::EYR,
+    PasswordField::HGT,
+    PasswordField::HCL,
+    PasswordField::ECL,
+    PasswordField::PID,
+];
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub enum PasswordField {
+    BYR,
+    IYR,
+    EYR,
+    HGT,
+    HCL,
+    ECL,
+    PID,
+    CID,
+}
+
+impl FromStr for PasswordField {
+    type Err = ();
+
+    fn from_str(input: &str) -> Result<PasswordField, Self::Err> {
+        match input {
+            "byr" => Ok(PasswordField::BYR),
+            "iyr" => Ok(PasswordField::IYR),
+            "eyr" => Ok(PasswordField::EYR),
+            "hgt" => Ok(PasswordField::HGT),
+            "hcl" => Ok(PasswordField::HCL),
+            "ecl" => Ok(PasswordField::ECL),
+            "pid" => Ok(PasswordField::PID),
+            "cid" => Ok(PasswordField::CID),
+            _ => Err(()),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -86,6 +175,6 @@ mod tests {
     fn test_n_valid() {
         let passports = super::to_passports(create_factory().into_iter());
 
-        assert_eq!(super::n_valid(&passports), 2);
+        assert_eq!(super::n_valid_keys(&passports), 2);
     }
 }

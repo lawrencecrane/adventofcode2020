@@ -1,3 +1,5 @@
+extern crate lazy_static;
+
 use aoc_utils::*;
 
 mod lib;
@@ -9,6 +11,11 @@ fn main() {
 
     println!(
         "PART 1 | number of valid passports: {}",
-        n_valid(&passports)
+        n_valid_keys(&passports)
+    );
+
+    println!(
+        "PART 2 | number of valid passports: {}",
+        n_valid_keys_and_values(&passports)
     );
 }
