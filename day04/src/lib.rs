@@ -46,9 +46,13 @@ fn has_valid_value(field: &PasswordField, value: &String) -> bool {
 }
 
 fn is_valid_height(height: &String) -> bool {
-    match (height.split("cm").next(), height.split("in").next()) {
-        (Some(cm), _) => parse_number_and(&cm.to_string(), |x| x >= 150 && x <= 193),
-        (_, Some(inch)) => parse_number_and(&inch.to_string(), |x| x >= 59 && x <= 76),
+    match (height.contains("cm"), height.contains("in")) {
+        (true, _) => parse_number_and(&height.split("cm").next().unwrap().to_string(), |x| {
+            x >= 150 && x <= 193
+        }),
+        (_, true) => parse_number_and(&height.split("in").next().unwrap().to_string(), |x| {
+            x >= 59 && x <= 76
+        }),
         _ => false,
     }
 }
