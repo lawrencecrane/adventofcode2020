@@ -45,6 +45,7 @@ enum Partition {
     LOWER,
     UPPER,
 }
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ParsePartitionError {}
 
