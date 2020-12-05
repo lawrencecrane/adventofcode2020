@@ -10,8 +10,6 @@ fn main() {
         .map(|s| get_seat_id(identify_seat(&s.unwrap())))
         .collect();
 
-    seat_ids.sort();
-
     let max_id = seat_ids.iter().max().unwrap();
 
     println!("PART 1 | max seat id: {}", max_id);
