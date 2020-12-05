@@ -5,10 +5,11 @@ mod lib;
 use lib::*;
 
 fn main() {
-    let seats: Vec<(usize, usize)> = read_lines("../data/05_input")
+    let max_id = read_lines("../data/05_input")
         .unwrap()
-        .map(|s| identify_seat(&s.unwrap()))
-        .collect();
+        .map(|s| get_seat_id(identify_seat(&s.unwrap())))
+        .max()
+        .unwrap();
 
-    println!("{:?}", seats);
+    println!("PART 1 | max seat id: {}", max_id);
 }

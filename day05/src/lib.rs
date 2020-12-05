@@ -1,3 +1,7 @@
+pub fn get_seat_id(seat: (usize, usize)) -> usize {
+    seat.0 * 8 + seat.1
+}
+
 pub fn identify_seat(seat: &String) -> (usize, usize) {
     let row_id = search_partition_space(seat.chars().take(7), (0, 127));
     let column_id = search_partition_space(seat.chars().skip(7).take(3), (0, 7));
