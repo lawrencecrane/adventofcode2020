@@ -1,3 +1,15 @@
+pub fn find_missing_seat_id(ids: &mut Vec<usize>) -> usize {
+    ids.sort();
+
+    let (_, id) = ids
+        .iter()
+        .enumerate()
+        .find(|(i, x)| *i != *x - ids[0])
+        .unwrap();
+
+    *id - 1
+}
+
 pub fn get_seat_id(seat: (usize, usize)) -> usize {
     seat.0 * 8 + seat.1
 }
