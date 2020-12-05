@@ -5,10 +5,10 @@ mod lib;
 use lib::*;
 
 fn main() {
-    let input: Vec<String> = read_lines("../data/05_input")
+    let seats: Vec<(usize, usize)> = read_lines("../data/05_input")
         .unwrap()
-        .map(|s| s.unwrap())
+        .map(|s| identify_seat(&s.unwrap()))
         .collect();
 
-    println!("{:?}", input);
+    println!("{:?}", seats);
 }
