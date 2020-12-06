@@ -1,6 +1,10 @@
 use itertools::Itertools;
 use std::iter::Iterator;
 
+pub fn count_all_yes_answers(groups: &Vec<Vec<String>>) -> usize {
+    0
+}
+
 pub fn count_any_yes_answers(groups: &Vec<Vec<String>>) -> usize {
     groups
         .iter()
@@ -52,9 +56,16 @@ mod tests {
     }
 
     #[test]
-    fn test_count_yes_answers() {
+    fn test_count_any_yes_answers() {
         let groups = super::to_groups(create_factory().into_iter());
 
         assert_eq!(super::count_any_yes_answers(&groups), 11);
+    }
+
+    #[test]
+    fn test_count_all_yes_answers() {
+        let groups = super::to_groups(create_factory().into_iter());
+
+        assert_eq!(super::count_all_yes_answers(&groups), 6);
     }
 }
