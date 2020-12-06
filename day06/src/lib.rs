@@ -1,5 +1,13 @@
 use std::iter::Iterator;
 
+pub fn count_yes_answers(groups: &Vec<Vec<String>>) -> usize {
+    0
+}
+
+fn n_yes_answers(group: &Vec<String>) -> usize {
+    0
+}
+
 pub fn to_groups<I>(raw: I) -> Vec<Vec<String>>
 where
     I: Iterator<Item = String>,
@@ -41,5 +49,12 @@ mod tests {
         let groups = create_factory();
 
         assert_eq!(super::to_groups(groups.into_iter()).len(), 5);
+    }
+
+    #[test]
+    fn test_count_yes_answers() {
+        let groups = super::to_groups(create_factory().into_iter());
+
+        assert_eq!(super::count_yes_answers(&groups), 11);
     }
 }
