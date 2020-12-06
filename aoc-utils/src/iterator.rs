@@ -54,8 +54,14 @@ mod tests {
     use super::AocIterator;
     #[test]
     fn test_duplicates() {
+        assert_eq!(vec![1, 1, 1].iter().duplicates().count(), 1);
+
+        assert_eq!(vec![1, 2, 1].iter().duplicates().count(), 1);
+
         assert_eq!(vec![1, 2, 3, 3, 3, 5].iter().duplicates().count(), 1);
+
         assert_eq!(vec![1, 2, 2, 3, 3, 3, 5].iter().duplicates().count(), 2);
+
         assert_eq!(
             vec![1, 2, 2, 3, 3, 3, 5, 6, 7, 8, 8, 8, 8]
                 .iter()

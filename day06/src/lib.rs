@@ -1,8 +1,15 @@
+use aoc_utils::iterator::AocIterator;
 use itertools::Itertools;
 use std::iter::Iterator;
 
 pub fn count_all_yes_answers(groups: &Vec<Vec<String>>) -> usize {
-    0
+    groups
+        .iter()
+        .map(|group| match group.len() {
+            1 => group[0].len(),
+            _ => group.iter().flat_map(|x| x.chars()).duplicates().count(),
+        })
+        .sum()
 }
 
 pub fn count_any_yes_answers(groups: &Vec<Vec<String>>) -> usize {
