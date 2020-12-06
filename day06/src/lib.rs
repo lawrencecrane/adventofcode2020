@@ -27,6 +27,19 @@ where
 
 #[cfg(test)]
 mod tests {
+    fn create_factory() -> Vec<String> {
+        vec![
+            "abc", "", "a", "b", "c", "", "ab", "ac", "", "a", "a", "a", "a", "", "b",
+        ]
+        .iter()
+        .map(|s| s.to_string())
+        .collect()
+    }
+
     #[test]
-    fn test() {}
+    fn test_to_groups() {
+        let groups = create_factory();
+
+        assert_eq!(super::to_groups(groups.into_iter()).len(), 5);
+    }
 }
