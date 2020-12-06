@@ -17,7 +17,7 @@ where
 
             *count += 1;
 
-            if count == &mut self.n {
+            if *count == self.n {
                 return Some(x);
             }
         }
