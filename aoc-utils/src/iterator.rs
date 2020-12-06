@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::HashMap;
 use std::hash::Hash;
 use std::iter::Iterator;
 
@@ -13,13 +13,13 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(x) = self.underlying.next() {
-            if self.seen.contains(&x) && !self.duplicates.contains(&x) {
-                self.duplicates.insert(x.clone());
+            let count = self.seen.entry(x.clone()).or_insert(0);
 
+            *count += 1;
+
+            if count == &mut self.n {
                 return Some(x);
             }
-
-            self.seen.insert(x.clone());
         }
 
         None
@@ -27,14 +27,14 @@ where
 }
 
 pub trait AocIterator: Iterator {
-    fn duplicates(self) -> Duplicate<Self>
+    fn duplicates(self, n: usize) -> Duplicate<Self>
     where
         Self: Sized,
         Self::Item: Hash + Eq + Clone,
     {
         Duplicate {
-            seen: HashSet::new(),
-            duplicates: HashSet::new(),
+            n,
+            seen: HashMap::new(),
             underlying: self,
         }
     }
@@ -44,8 +44,8 @@ pub struct Duplicate<I>
 where
     I: Iterator,
 {
-    seen: HashSet<I::Item>,
-    duplicates: HashSet<I::Item>,
+    n: usize,
+    seen: HashMap<I::Item, usize>,
     underlying: I,
 }
 
@@ -53,21 +53,28 @@ where
 mod tests {
     use super::AocIterator;
     #[test]
-    fn test_duplicates() {
-        assert_eq!(vec![1, 1, 1].iter().duplicates().count(), 1);
+    fn test_duplicates_of_2() {
+        assert_eq!(vec![1, 1, 1].iter().duplicates(2).count(), 1);
 
-        assert_eq!(vec![1, 2, 1].iter().duplicates().count(), 1);
+        assert_eq!(vec![1, 2, 1].iter().duplicates(2).count(), 1);
 
-        assert_eq!(vec![1, 2, 3, 3, 3, 5].iter().duplicates().count(), 1);
+        assert_eq!(vec![1, 2, 3, 3, 3, 5].iter().duplicates(2).count(), 1);
 
-        assert_eq!(vec![1, 2, 2, 3, 3, 3, 5].iter().duplicates().count(), 2);
+        assert_eq!(vec![1, 2, 2, 3, 3, 3, 5].iter().duplicates(2).count(), 2);
 
         assert_eq!(
             vec![1, 2, 2, 3, 3, 3, 5, 6, 7, 8, 8, 8, 8]
                 .iter()
-                .duplicates()
+                .duplicates(2)
                 .count(),
             3
         );
+    }
+
+    #[test]
+    fn test_duplicates_of_3() {
+        assert_eq!(vec![1, 1, 1].iter().duplicates(3).count(), 1);
+
+        assert_eq!(vec![1, 2, 1].iter().duplicates(3).count(), 0);
     }
 }

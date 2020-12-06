@@ -5,9 +5,12 @@ use std::iter::Iterator;
 pub fn count_all_yes_answers(groups: &Vec<Vec<String>>) -> usize {
     groups
         .iter()
-        .map(|group| match group.len() {
-            1 => group[0].len(),
-            _ => group.iter().flat_map(|x| x.chars()).duplicates().count(),
+        .map(|group| {
+            group
+                .iter()
+                .flat_map(|x| x.chars())
+                .duplicates(group.len())
+                .count()
         })
         .sum()
 }
