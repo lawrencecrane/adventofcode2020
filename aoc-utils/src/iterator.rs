@@ -13,7 +13,7 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(x) = self.underlying.next() {
-            let count = self.seen.entry(x.clone()).or_insert(0);
+            let count = self.counts.entry(x.clone()).or_insert(0);
 
             *count += 1;
 
@@ -34,7 +34,7 @@ pub trait AocIterator: Iterator {
     {
         Duplicate {
             n,
-            seen: HashMap::new(),
+            counts: HashMap::new(),
             underlying: self,
         }
     }
@@ -45,7 +45,7 @@ where
     I: Iterator,
 {
     n: usize,
-    seen: HashMap<I::Item, usize>,
+    counts: HashMap<I::Item, usize>,
     underlying: I,
 }
 
