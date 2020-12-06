@@ -1,11 +1,12 @@
+use itertools::Itertools;
 use std::iter::Iterator;
 
 pub fn count_yes_answers(groups: &Vec<Vec<String>>) -> usize {
-    0
+    groups.iter().map(n_yes_answers).sum()
 }
 
 fn n_yes_answers(group: &Vec<String>) -> usize {
-    0
+    group.iter().flat_map(|x| x.chars()).unique().count()
 }
 
 pub fn to_groups<I>(raw: I) -> Vec<Vec<String>>
