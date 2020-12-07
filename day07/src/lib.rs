@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 pub fn n_bag_contains(bags: &Vec<Bag>, name: String) -> usize {
-    let subset = _bag_contains(
+    let subset = bag_contains(
         bags,
         vec![bags.iter().find(|x| x.name == name).unwrap().clone()],
         0,
@@ -39,7 +39,7 @@ fn calculate_value_of_bag(values: &HashMap<String, usize>, bag: &Bag) -> Option<
     }
 }
 
-fn _bag_contains(bags: &Vec<Bag>, mut containers: Vec<Bag>, index: usize) -> Vec<Bag> {
+fn bag_contains(bags: &Vec<Bag>, mut containers: Vec<Bag>, index: usize) -> Vec<Bag> {
     let mut new_containers: Vec<Bag> = bags
         .iter()
         .filter(|bag| {
@@ -59,7 +59,7 @@ fn _bag_contains(bags: &Vec<Bag>, mut containers: Vec<Bag>, index: usize) -> Vec
 
             containers.append(&mut new_containers);
 
-            _bag_contains(bags, containers, new_index)
+            bag_contains(bags, containers, new_index)
         }
     }
 }
