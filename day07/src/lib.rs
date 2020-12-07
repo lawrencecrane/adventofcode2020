@@ -1,11 +1,7 @@
 use std::collections::HashMap;
 
 pub fn n_bag_contains(bags: &Vec<Bag>, name: String) -> usize {
-    let subset = search_bags(
-        bags,
-        bags.iter().find(|x| x.name == name).unwrap().clone(),
-        |bag, found| found.contains(&bag.name),
-    );
+    let subset = find_children(bags, &name);
 
     *calculate_values_of_bags(&subset).get(&name).unwrap()
 }
@@ -40,24 +36,30 @@ fn calculate_value_of_bag(values: &HashMap<String, usize>, bag: &Bag) -> Option<
 }
 
 pub fn n_bags_containing(bags: &Vec<Bag>, name: String) -> usize {
-    search_bags(
-        bags,
-        bags.iter().find(|bag| bag.name == name).unwrap().clone(),
-        |bag, res| bag.contains(&res.name),
-    )
-    .iter()
-    .count()
-        - 1
+    find_parents(bags, &name).iter().count() - 1
 }
 
-fn search_bags<F>(bags: &Vec<Bag>, bag: Bag, f: F) -> Vec<Bag>
+fn find_children(bags: &Vec<Bag>, name: &String) -> Vec<Bag> {
+    search(bags, &name, |bag, parent| parent.contains(&bag.name))
+}
+
+fn find_parents(bags: &Vec<Bag>, name: &String) -> Vec<Bag> {
+    search(bags, &name, |bag, child| bag.contains(&child.name))
+}
+
+fn search<F>(bags: &Vec<Bag>, name: &String, f: F) -> Vec<Bag>
 where
     F: Fn(&Bag, &Bag) -> bool,
 {
-    _search_bags(bags, vec![bag], f, 0)
+    _search(
+        bags,
+        vec![bags.iter().find(|x| x.name == *name).unwrap().clone()],
+        f,
+        0,
+    )
 }
 
-fn _search_bags<F>(bags: &Vec<Bag>, mut found: Vec<Bag>, f: F, index: usize) -> Vec<Bag>
+fn _search<F>(bags: &Vec<Bag>, mut found: Vec<Bag>, f: F, index: usize) -> Vec<Bag>
 where
     F: Fn(&Bag, &Bag) -> bool,
 {
@@ -75,7 +77,7 @@ where
 
             found.append(&mut new_results);
 
-            _search_bags(bags, found, f, new_index)
+            _search(bags, found, f, new_index)
         }
     }
 }
