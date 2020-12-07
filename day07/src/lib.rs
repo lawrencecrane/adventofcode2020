@@ -110,4 +110,15 @@ mod tests {
             }
         );
     }
+
+    #[test]
+    fn test_to_bag_no_other_bags() {
+        assert_eq!(
+            super::to_bag("dim tomato bags contain no other bags.".to_string()),
+            super::Bag {
+                name: "dim tomato".to_string(),
+                contains: vec![]
+            }
+        );
+    }
 }
