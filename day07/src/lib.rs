@@ -25,6 +25,7 @@ fn to_bag(bag: String) -> Bag {
         .next()
         .unwrap()
         .split(',')
+        .filter(|x| !x.contains("no other bags"))
         .map(|x| {
             let (n, name) =
                 split_once(x.split("bag").next().unwrap().trim().to_string(), " ").unwrap();
