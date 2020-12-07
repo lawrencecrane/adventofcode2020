@@ -6,6 +6,10 @@ pub fn n_bag_contains(bags: &Vec<Bag>, name: String) -> usize {
     *calculate_values_of_bags(&subset).get(&name).unwrap()
 }
 
+pub fn n_bags_containing(bags: &Vec<Bag>, name: String) -> usize {
+    find_parents(bags, &name).iter().count() - 1
+}
+
 fn calculate_values_of_bags(bags: &Vec<Bag>) -> HashMap<String, usize> {
     let mut values = HashMap::new();
 
@@ -33,10 +37,6 @@ fn calculate_value_of_bag(values: &HashMap<String, usize>, bag: &Bag) -> Option<
         ),
         false => None,
     }
-}
-
-pub fn n_bags_containing(bags: &Vec<Bag>, name: String) -> usize {
-    find_parents(bags, &name).iter().count() - 1
 }
 
 fn find_children(bags: &Vec<Bag>, name: &String) -> Vec<Bag> {
