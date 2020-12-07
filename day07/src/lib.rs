@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
 pub fn n_bag_contains(bags: &Vec<Bag>, name: String) -> usize {
-    let subset = bag_contains(
+    let subset = search_bags(
         bags,
-        vec![bags.iter().find(|x| x.name == name).unwrap().clone()],
-        0,
+        bags.iter().find(|x| x.name == name).unwrap().clone(),
+        |bag, found| found.contains(&bag.name),
     );
 
     *calculate_values_of_bags(&subset).get(&name).unwrap()
@@ -39,54 +39,43 @@ fn calculate_value_of_bag(values: &HashMap<String, usize>, bag: &Bag) -> Option<
     }
 }
 
-fn bag_contains(bags: &Vec<Bag>, mut containers: Vec<Bag>, index: usize) -> Vec<Bag> {
-    let mut new_containers: Vec<Bag> = bags
-        .iter()
-        .filter(|bag| {
-            containers
-                .iter()
-                .skip(index)
-                .any(|container| container.contains(&bag.name))
-        })
-        .filter(|bag| !containers.contains(bag))
-        .map(|bag| bag.clone())
-        .collect();
-
-    match new_containers.len() {
-        0 => containers,
-        _ => {
-            let new_index = containers.len();
-
-            containers.append(&mut new_containers);
-
-            bag_contains(bags, containers, new_index)
-        }
-    }
-}
-
 pub fn n_bags_containing(bags: &Vec<Bag>, name: String) -> usize {
-    _n_bags_containing(bags, vec![name.to_string()], 0)
-        .iter()
-        .count()
+    search_bags(
+        bags,
+        bags.iter().find(|bag| bag.name == name).unwrap().clone(),
+        |bag, res| bag.contains(&res.name),
+    )
+    .iter()
+    .count()
         - 1
 }
 
-fn _n_bags_containing(bags: &Vec<Bag>, mut names: Vec<String>, index: usize) -> Vec<String> {
-    let mut new_names: Vec<String> = bags
+fn search_bags<F>(bags: &Vec<Bag>, bag: Bag, f: F) -> Vec<Bag>
+where
+    F: Fn(&Bag, &Bag) -> bool,
+{
+    _search_bags(bags, vec![bag], f, 0)
+}
+
+fn _search_bags<F>(bags: &Vec<Bag>, mut found: Vec<Bag>, f: F, index: usize) -> Vec<Bag>
+where
+    F: Fn(&Bag, &Bag) -> bool,
+{
+    let mut new_results: Vec<Bag> = bags
         .iter()
-        .filter(|bag| names.iter().skip(index).any(|name| bag.contains(name)))
-        .map(|bag| bag.name.clone())
-        .filter(|bag| !names.contains(bag))
+        .filter(|bag| found.iter().skip(index).any(|result| f(bag, result)))
+        .filter(|bag| !found.contains(bag))
+        .map(|bag| bag.clone())
         .collect();
 
-    match new_names.len() {
-        0 => names,
+    match new_results.len() {
+        0 => found,
         _ => {
-            let new_index = names.len();
+            let new_index = found.len();
 
-            names.append(&mut new_names);
+            found.append(&mut new_results);
 
-            _n_bags_containing(bags, names, new_index)
+            _search_bags(bags, found, f, new_index)
         }
     }
 }
