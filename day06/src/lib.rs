@@ -9,7 +9,7 @@ pub fn count_all_yes_answers(groups: &Vec<Vec<String>>) -> usize {
             group
                 .iter()
                 .flat_map(|x| x.chars())
-                .duplicates(group.len())
+                .take_every_nth(group.len())
                 .count()
         })
         .sum()

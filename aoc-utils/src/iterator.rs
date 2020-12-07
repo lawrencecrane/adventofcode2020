@@ -4,7 +4,7 @@ use std::iter::Iterator;
 
 impl<I: Iterator> AocIterator for I {}
 
-impl<I> Iterator for Duplicate<I>
+impl<I> Iterator for TakeEveryNth<I>
 where
     I: Iterator,
     I::Item: Hash + Eq + Clone,
@@ -13,11 +13,11 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(x) = self.underlying.next() {
-            let count = self.counts.entry(x.clone()).or_insert(0);
+            let count = self.occurences.entry(x.clone()).or_insert(0);
 
             *count += 1;
 
-            if *count == self.n {
+            if *count == self.nth {
                 return Some(x);
             }
         }
@@ -27,45 +27,49 @@ where
 }
 
 pub trait AocIterator: Iterator {
-    fn duplicates(self, n: usize) -> Duplicate<Self>
+    fn take_every_nth(self, nth: usize) -> TakeEveryNth<Self>
     where
         Self: Sized,
         Self::Item: Hash + Eq + Clone,
     {
-        Duplicate {
-            n,
-            counts: HashMap::new(),
+        TakeEveryNth {
+            nth,
+            occurences: HashMap::new(),
             underlying: self,
         }
     }
 }
 
-pub struct Duplicate<I>
+pub struct TakeEveryNth<I>
 where
     I: Iterator,
 {
-    n: usize,
-    counts: HashMap<I::Item, usize>,
+    nth: usize,
+    occurences: HashMap<I::Item, usize>,
     underlying: I,
 }
 
 #[cfg(test)]
 mod tests {
     use super::AocIterator;
+
     #[test]
     fn test_duplicates_of_2() {
-        assert_eq!(vec![1, 1, 1].iter().duplicates(2).count(), 1);
+        assert_eq!(vec![1, 1, 1].iter().take_every_nth(2).count(), 1);
 
-        assert_eq!(vec![1, 2, 1].iter().duplicates(2).count(), 1);
+        assert_eq!(vec![1, 2, 1].iter().take_every_nth(2).count(), 1);
 
-        assert_eq!(vec![1, 2, 3, 3, 3, 5].iter().duplicates(2).count(), 1);
+        assert_eq!(vec![1, 2, 3, 3, 3, 5].iter().take_every_nth(2).count(), 1);
 
-        assert_eq!(vec![1, 2, 2, 3, 3, 3, 5].iter().duplicates(2).count(), 2);
+        assert_eq!(
+            vec![1, 2, 2, 3, 3, 3, 5].iter().take_every_nth(2).count(),
+            2
+        );
 
         assert_eq!(
             vec![1, 2, 2, 3, 3, 3, 5, 6, 7, 8, 8, 8, 8]
                 .iter()
-                .duplicates(2)
+                .take_every_nth(2)
                 .count(),
             3
         );
@@ -73,8 +77,8 @@ mod tests {
 
     #[test]
     fn test_duplicates_of_3() {
-        assert_eq!(vec![1, 1, 1].iter().duplicates(3).count(), 1);
+        assert_eq!(vec![1, 1, 1].iter().take_every_nth(3).count(), 1);
 
-        assert_eq!(vec![1, 2, 1].iter().duplicates(3).count(), 0);
+        assert_eq!(vec![1, 2, 1].iter().take_every_nth(3).count(), 0);
     }
 }
