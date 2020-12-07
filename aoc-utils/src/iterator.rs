@@ -13,11 +13,11 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(x) = self.underlying.next() {
-            let count = self.occurences.entry(x.clone()).or_insert(0);
+            let rank = self.ranks.entry(x.clone()).or_insert(0);
 
-            *count += 1;
+            *rank += 1;
 
-            if *count == self.nth {
+            if *rank == self.nth {
                 return Some(x);
             }
         }
@@ -34,7 +34,7 @@ pub trait AocIterator: Iterator {
     {
         TakeEveryNth {
             nth,
-            occurences: HashMap::new(),
+            ranks: HashMap::new(),
             underlying: self,
         }
     }
@@ -45,7 +45,7 @@ where
     I: Iterator,
 {
     nth: usize,
-    occurences: HashMap<I::Item, usize>,
+    ranks: HashMap<I::Item, usize>,
     underlying: I,
 }
 
