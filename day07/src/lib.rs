@@ -1,3 +1,7 @@
+pub fn n_bag_contains(bags: &Vec<Bag>, name: String) -> usize {
+    0
+}
+
 pub fn n_bags_containing(bags: &Vec<Bag>, name: String) -> usize {
     _n_bags_containing(bags, vec![name.to_string()], 0)
         .iter()
@@ -110,7 +114,14 @@ mod tests {
     }
 
     #[test]
-    fn test_n_bags_that_can_contain() {
+    fn test_n_bag_contains() {
+        let bags = super::to_bags(create_factory().into_iter());
+
+        assert_eq!(super::n_bag_contains(&bags, "shiny gold".to_string()), 32);
+    }
+
+    #[test]
+    fn test_n_bags_containing() {
         let bags = super::to_bags(create_factory().into_iter());
 
         assert_eq!(super::n_bags_containing(&bags, "shiny gold".to_string()), 4);
