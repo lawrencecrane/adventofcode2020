@@ -65,8 +65,7 @@ where
 {
     let mut new_results: Vec<Bag> = bags
         .iter()
-        .filter(|bag| found.iter().skip(index).any(|result| f(bag, result)))
-        .filter(|bag| !found.contains(bag))
+        .filter(|bag| !found.contains(bag) && found.iter().skip(index).any(|result| f(bag, result)))
         .map(|bag| bag.clone())
         .collect();
 
