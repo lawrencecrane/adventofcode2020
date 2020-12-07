@@ -1,11 +1,11 @@
-pub fn n_bags_that_can_contain(bags: &Vec<Bag>, name: String) -> usize {
-    _n_bags_that_can_contain(bags, vec![name.to_string()], 0)
+pub fn n_bags_containing(bags: &Vec<Bag>, name: String) -> usize {
+    _n_bags_containing(bags, vec![name.to_string()], 0)
         .iter()
         .count()
         - 1
 }
 
-fn _n_bags_that_can_contain(bags: &Vec<Bag>, mut names: Vec<String>, index: usize) -> Vec<String> {
+fn _n_bags_containing(bags: &Vec<Bag>, mut names: Vec<String>, index: usize) -> Vec<String> {
     let mut new_names: Vec<String> = bags
         .iter()
         .filter(|bag| names.iter().skip(index).any(|name| bag.contains(name)))
@@ -20,7 +20,7 @@ fn _n_bags_that_can_contain(bags: &Vec<Bag>, mut names: Vec<String>, index: usiz
 
             names.append(&mut new_names);
 
-            _n_bags_that_can_contain(bags, names, new_index)
+            _n_bags_containing(bags, names, new_index)
         }
     }
 }
@@ -113,10 +113,7 @@ mod tests {
     fn test_n_bags_that_can_contain() {
         let bags = super::to_bags(create_factory().into_iter());
 
-        assert_eq!(
-            super::n_bags_that_can_contain(&bags, "shiny gold".to_string()),
-            4
-        );
+        assert_eq!(super::n_bags_containing(&bags, "shiny gold".to_string()), 4);
     }
 
     #[test]

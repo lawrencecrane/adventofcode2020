@@ -9,6 +9,6 @@ fn main() {
 
     println!(
         "PART 1 | {}",
-        n_bags_that_can_contain(&bags, "shiny gold".to_string())
+        n_bags_containing(&bags, "shiny gold".to_string())
     );
 }
