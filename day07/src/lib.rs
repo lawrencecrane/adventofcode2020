@@ -1,5 +1,20 @@
-pub fn n_bags_that_can_contain(bags: &Vec<Bag>, bag: String) -> usize {
-    0
+pub fn n_bags_that_can_contain(bags: &Vec<Bag>, name: String) -> usize {
+    _n_bags_that_can_contain(bags, &vec![name.to_string()], 0)
+}
+
+fn _n_bags_that_can_contain(bags: &Vec<Bag>, names: &Vec<String>, n: usize) -> usize {
+    match names.len() {
+        0 => n,
+        _ => {
+            let new_names: Vec<String> = bags
+                .iter()
+                .filter(|bag| names.iter().any(|name| bag.contains(name)))
+                .map(|bag| bag.name.clone())
+                .collect();
+
+            _n_bags_that_can_contain(bags, &new_names, n + new_names.len())
+        }
+    }
 }
 
 pub fn to_bags<I>(bags: I) -> Vec<Bag>
@@ -46,6 +61,12 @@ fn split_once(x: String, pattern: &str) -> Option<(String, String)> {
     match (s.next(), s.next()) {
         (Some(fst), Some(snd)) => Some((fst.to_string(), snd.to_string())),
         _ => None,
+    }
+}
+
+impl Bag {
+    pub fn contains(&self, name: &String) -> bool {
+        self.contains.iter().any(|x| x.name == *name)
     }
 }
 
