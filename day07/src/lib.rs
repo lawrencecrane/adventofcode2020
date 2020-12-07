@@ -1,12 +1,15 @@
-pub fn n_bags_that_can_contain(bags: &Vec<String>, bag: String) -> usize {
+pub fn n_bags_that_can_contain(bags: &Vec<Bag>, bag: String) -> usize {
     0
 }
 
-pub fn to_bags(bags: &Vec<String>) -> Vec<Bag> {
-    bags.iter().map(&to_bag).collect()
+pub fn to_bags<I>(bags: I) -> Vec<Bag>
+where
+    I: Iterator<Item = String>,
+{
+    bags.map(&to_bag).collect()
 }
 
-fn to_bag(bag: &String) -> Bag {
+fn to_bag(bag: String) -> Bag {
     let mut s = bag.split("contain");
 
     let name = s
@@ -78,7 +81,7 @@ mod tests {
 
     #[test]
     fn test_n_bags_that_can_contain() {
-        let bags = create_factory();
+        let bags = super::to_bags(create_factory().into_iter());
 
         assert_eq!(
             super::n_bags_that_can_contain(&bags, "shiny gold".to_string()),
@@ -90,7 +93,7 @@ mod tests {
     fn test_to_bag() {
         assert_eq!(
             super::to_bag(
-                &"light red bags contain 1 bright white bag, 2 muted yellow bags.".to_string()
+                "light red bags contain 1 bright white bag, 2 muted yellow bags.".to_string()
             ),
             super::Bag {
                 name: "light red".to_string(),
