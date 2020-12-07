@@ -1,18 +1,26 @@
 pub fn n_bags_that_can_contain(bags: &Vec<Bag>, name: String) -> usize {
-    _n_bags_that_can_contain(bags, &vec![name.to_string()], 0)
+    _n_bags_that_can_contain(bags, vec![name.to_string()], 0)
+        .iter()
+        .count()
+        - 1
 }
 
-fn _n_bags_that_can_contain(bags: &Vec<Bag>, names: &Vec<String>, n: usize) -> usize {
-    match names.len() {
-        0 => n,
-        _ => {
-            let new_names: Vec<String> = bags
-                .iter()
-                .filter(|bag| names.iter().any(|name| bag.contains(name)))
-                .map(|bag| bag.name.clone())
-                .collect();
+fn _n_bags_that_can_contain(bags: &Vec<Bag>, mut names: Vec<String>, index: usize) -> Vec<String> {
+    let mut new_names: Vec<String> = bags
+        .iter()
+        .filter(|bag| names.iter().skip(index).any(|name| bag.contains(name)))
+        .map(|bag| bag.name.clone())
+        .filter(|bag| !names.contains(bag))
+        .collect();
 
-            _n_bags_that_can_contain(bags, &new_names, n + new_names.len())
+    match new_names.len() {
+        0 => names,
+        _ => {
+            let new_index = names.len();
+
+            names.append(&mut new_names);
+
+            _n_bags_that_can_contain(bags, names, new_index)
         }
     }
 }
@@ -36,7 +44,7 @@ fn to_bag(bag: String) -> Bag {
         .trim()
         .to_string();
 
-    let contains: Vec<Container> = s
+    let can_contain: Vec<Container> = s
         .next()
         .unwrap()
         .split(',')
@@ -52,7 +60,7 @@ fn to_bag(bag: String) -> Bag {
         })
         .collect();
 
-    Bag { name, contains }
+    Bag { name, can_contain }
 }
 
 fn split_once(x: String, pattern: &str) -> Option<(String, String)> {
@@ -66,14 +74,14 @@ fn split_once(x: String, pattern: &str) -> Option<(String, String)> {
 
 impl Bag {
     pub fn contains(&self, name: &String) -> bool {
-        self.contains.iter().any(|x| x.name == *name)
+        self.can_contain.iter().any(|x| x.name == *name)
     }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Bag {
     name: String,
-    contains: Vec<Container>,
+    can_contain: Vec<Container>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -119,7 +127,7 @@ mod tests {
             ),
             super::Bag {
                 name: "light red".to_string(),
-                contains: vec![
+                can_contain: vec![
                     super::Container {
                         name: "bright white".to_string(),
                         n: 1
@@ -139,7 +147,7 @@ mod tests {
             super::to_bag("dim tomato bags contain no other bags.".to_string()),
             super::Bag {
                 name: "dim tomato".to_string(),
-                contains: vec![]
+                can_contain: vec![]
             }
         );
     }
