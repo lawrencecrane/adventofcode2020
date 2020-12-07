@@ -11,4 +11,9 @@ fn main() {
         "PART 1 | {}",
         n_bags_containing(&bags, "shiny gold".to_string())
     );
+
+    println!(
+        "PART 2 | {}",
+        n_bag_contains(&bags, "shiny gold".to_string())
+    );
 }

@@ -1,5 +1,67 @@
+use std::collections::HashMap;
+
 pub fn n_bag_contains(bags: &Vec<Bag>, name: String) -> usize {
-    0
+    let subset = _bag_contains(
+        bags,
+        vec![bags.iter().find(|x| x.name == name).unwrap().clone()],
+        0,
+    );
+
+    *calculate_values_of_bags(&subset).get(&name).unwrap()
+}
+
+fn calculate_values_of_bags(bags: &Vec<Bag>) -> HashMap<String, usize> {
+    let mut values = HashMap::new();
+
+    while values.len() < bags.len() {
+        bags.iter().for_each(|bag| {
+            match calculate_value_of_bag(&values, bag) {
+                Some(value) => {
+                    values.insert(bag.name.clone(), value);
+                }
+                None => (),
+            };
+        });
+    }
+
+    values
+}
+
+fn calculate_value_of_bag(values: &HashMap<String, usize>, bag: &Bag) -> Option<usize> {
+    match bag.can_contain.iter().all(|x| values.contains_key(&x.name)) {
+        true => Some(
+            bag.can_contain
+                .iter()
+                .map(|x| x.n + values.get(&x.name).unwrap() * x.n)
+                .sum(),
+        ),
+        false => None,
+    }
+}
+
+fn _bag_contains(bags: &Vec<Bag>, mut containers: Vec<Bag>, index: usize) -> Vec<Bag> {
+    let mut new_containers: Vec<Bag> = bags
+        .iter()
+        .filter(|bag| {
+            containers
+                .iter()
+                .skip(index)
+                .any(|container| container.contains(&bag.name))
+        })
+        .filter(|bag| !containers.contains(bag))
+        .map(|bag| bag.clone())
+        .collect();
+
+    match new_containers.len() {
+        0 => containers,
+        _ => {
+            let new_index = containers.len();
+
+            containers.append(&mut new_containers);
+
+            _bag_contains(bags, containers, new_index)
+        }
+    }
 }
 
 pub fn n_bags_containing(bags: &Vec<Bag>, name: String) -> usize {
