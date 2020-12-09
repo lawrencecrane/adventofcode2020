@@ -3,7 +3,7 @@ pub fn execute(code: Vec<Code>) -> isize {
 }
 
 fn _execute(code: Vec<Code>, acc: isize, index: usize, mut executed: Vec<usize>) -> isize {
-    match executed.contains(&index) {
+    match executed.contains(&index) || index == code.len() {
         true => acc,
         false => {
             executed.push(index);
