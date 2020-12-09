@@ -1,23 +1,19 @@
 use std::collections::{HashSet, VecDeque};
 
 pub fn find_contiguous_set_summing_to(sum: usize, numbers: &Vec<usize>) -> VecDeque<usize> {
-    let (deque, _) = numbers
-        .iter()
-        .fold((VecDeque::new(), 0), |(mut deque, acc), x| {
-            if acc == sum {
-                return (deque, acc);
-            }
+    let (mut deque, mut acc) = (VecDeque::new(), 0);
 
-            deque.push_back(*x);
+    for x in numbers.iter() {
+        if acc == sum {
+            break;
+        }
 
-            let mut new_acc = acc + x;
+        (deque.push_back(*x), acc += x);
 
-            while new_acc > sum {
-                new_acc -= deque.pop_front().unwrap();
-            }
-
-            (deque, new_acc)
-        });
+        while acc > sum {
+            acc -= deque.pop_front().unwrap();
+        }
+    }
 
     deque
 }
