@@ -1,8 +1,12 @@
-pub fn execute(code: Vec<Code>) -> (isize, bool) {
+pub fn execute_corrupted_program(code: &Vec<Code>) -> isize {
+    0
+}
+
+pub fn execute(code: &Vec<Code>) -> (isize, bool) {
     _execute(code, 0, 0, Vec::new())
 }
 
-fn _execute(code: Vec<Code>, acc: isize, index: usize, mut executed: Vec<usize>) -> (isize, bool) {
+fn _execute(code: &Vec<Code>, acc: isize, index: usize, mut executed: Vec<usize>) -> (isize, bool) {
     match (executed.contains(&index), index == code.len()) {
         (true, _) => (acc, false),
         (_, true) => (acc, true),
@@ -87,6 +91,13 @@ mod tests {
     fn test_execute() {
         let code = super::to_codes(create_factory().into_iter());
 
-        assert_eq!(super::execute(code), (5, false))
+        assert_eq!(super::execute(&code), (5, false))
+    }
+
+    #[test]
+    fn test_execute_corrupted_program() {
+        let code = super::to_codes(create_factory().into_iter());
+
+        assert_eq!(super::execute_corrupted_program(&code), 8)
     }
 }
