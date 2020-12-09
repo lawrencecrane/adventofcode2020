@@ -1,5 +1,9 @@
 use std::collections::HashSet;
 
+pub fn find_contiguous_set_summing_to(sum: usize, numbers: &Vec<usize>) -> Vec<usize> {
+    Vec::new()
+}
+
 pub fn find_first_mismatch(numbers: &Vec<usize>, preamble: usize) -> usize {
     let (_, value) = numbers
         .iter()
@@ -50,5 +54,15 @@ mod tests {
         let numbers = create_factory();
 
         assert_eq!(super::find_first_mismatch(&numbers, 5), 127);
+    }
+
+    #[test]
+    fn test_find_contiguous_set_summing_to() {
+        let numbers = create_factory();
+
+        assert_eq!(
+            super::find_contiguous_set_summing_to(127, &numbers),
+            vec![15, 25, 47, 40]
+        );
     }
 }
