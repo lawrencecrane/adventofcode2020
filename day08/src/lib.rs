@@ -1,10 +1,37 @@
 pub fn execute_corrupted_program(code: &Vec<Code>) -> isize {
+    let mut index: usize = 0;
+
     loop {
-        let (acc, terminated) = execute(code);
+        index += code
+            .iter()
+            .skip(index)
+            .position(|x| x.instruction == Instruction::NOP || x.instruction == Instruction::JMP)
+            .unwrap();
+
+        let (acc, terminated) = _execute(code, 0, 0, Vec::new(), &|x, pos| match pos == index {
+            true => swap_corrupted_instruction(x),
+            false => x,
+        });
 
         if terminated {
-            return acc;
+            break acc;
         }
+
+        index += 1;
+    }
+}
+
+fn swap_corrupted_instruction(code: Code) -> Code {
+    match code.instruction {
+        Instruction::NOP => Code {
+            instruction: Instruction::JMP,
+            value: code.value,
+        },
+        Instruction::JMP => Code {
+            instruction: Instruction::NOP,
+            value: code.value,
+        },
+        _ => code,
     }
 }
 
