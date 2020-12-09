@@ -1,12 +1,12 @@
 pub fn execute_corrupted_program(code: &Vec<Code>) -> isize {
-    let mut index: usize = 0;
+    let mut indeces = code
+        .iter()
+        .enumerate()
+        .filter(|(_, x)| x.instruction == Instruction::NOP || x.instruction == Instruction::JMP)
+        .map(|(i, _)| i);
 
     loop {
-        index += code
-            .iter()
-            .skip(index)
-            .position(|x| x.instruction == Instruction::NOP || x.instruction == Instruction::JMP)
-            .unwrap();
+        let index = indeces.next().unwrap();
 
         let (acc, terminated) = _execute(code, 0, 0, Vec::new(), &|x, pos| match pos == index {
             true => swap_corrupted_instruction(x),
@@ -16,8 +16,6 @@ pub fn execute_corrupted_program(code: &Vec<Code>) -> isize {
         if terminated {
             break acc;
         }
-
-        index += 1;
     }
 }
 
