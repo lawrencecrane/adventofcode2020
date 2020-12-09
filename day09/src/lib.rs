@@ -1,5 +1,39 @@
-pub fn find_first_mismatch(numbers: Vec<usize>, preamble: usize) -> usize {
-    0
+use std::collections::HashSet;
+
+pub fn find_first_mismatch(numbers: &Vec<usize>, preamble: usize) -> usize {
+    let (_, value) = numbers
+        .iter()
+        .enumerate()
+        .skip(preamble)
+        .find(|(i, x)| !any_two_sums_to(x, numbers.iter().skip(i - preamble).take(preamble)))
+        .unwrap();
+
+    *value
+}
+
+fn any_two_sums_to<'a, I>(sum: &usize, mut numbers: I) -> bool
+where
+    I: Iterator<Item = &'a usize>,
+{
+    let mut set = HashSet::new();
+
+    loop {
+        match numbers.next() {
+            Some(x) => {
+                if x > sum {
+                    continue;
+                }
+
+                if set.contains(x) || set.contains(&(sum - x)) {
+                    break true;
+                }
+
+                set.insert(*x);
+                set.insert(sum - x);
+            }
+            None => break false,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -15,6 +49,6 @@ mod tests {
     fn test_find_first_mismatch() {
         let numbers = create_factory();
 
-        assert_eq!(super::find_first_mismatch(numbers, 5), 127);
+        assert_eq!(super::find_first_mismatch(&numbers, 5), 127);
     }
 }
