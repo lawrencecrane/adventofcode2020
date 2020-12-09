@@ -1,28 +1,46 @@
 pub fn execute_corrupted_program(code: &Vec<Code>) -> isize {
-    0
+    loop {
+        let (acc, terminated) = execute(code);
+
+        if terminated {
+            return acc;
+        }
+    }
 }
 
 pub fn execute(code: &Vec<Code>) -> (isize, bool) {
-    _execute(code, 0, 0, Vec::new())
+    _execute(code, 0, 0, Vec::new(), &|x, _| x)
 }
 
-fn _execute(code: &Vec<Code>, acc: isize, index: usize, mut executed: Vec<usize>) -> (isize, bool) {
+fn _execute<F>(
+    code: &Vec<Code>,
+    acc: isize,
+    index: usize,
+    mut executed: Vec<usize>,
+    attach: F,
+) -> (isize, bool)
+where
+    F: Fn(Code, usize) -> Code,
+{
     match (executed.contains(&index), index == code.len()) {
         (true, _) => (acc, false),
         (_, true) => (acc, true),
         _ => {
             executed.push(index);
 
-            let instruction = code[index];
+            let instruction = attach(code[index], index);
 
             match instruction.instruction {
-                Instruction::NOP => _execute(code, acc, index + 1, executed),
-                Instruction::ACC => _execute(code, acc + instruction.value, index + 1, executed),
+                Instruction::NOP => _execute(code, acc, index + 1, executed, attach),
+                Instruction::ACC => {
+                    _execute(code, acc + instruction.value, index + 1, executed, attach)
+                }
                 Instruction::JMP => _execute(
                     code,
                     acc,
                     (index as isize + instruction.value) as usize,
                     executed,
+                    attach,
                 ),
             }
         }
