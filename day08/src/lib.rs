@@ -1,11 +1,12 @@
-pub fn execute(code: Vec<Code>) -> isize {
+pub fn execute(code: Vec<Code>) -> (isize, bool) {
     _execute(code, 0, 0, Vec::new())
 }
 
-fn _execute(code: Vec<Code>, acc: isize, index: usize, mut executed: Vec<usize>) -> isize {
-    match executed.contains(&index) || index == code.len() {
-        true => acc,
-        false => {
+fn _execute(code: Vec<Code>, acc: isize, index: usize, mut executed: Vec<usize>) -> (isize, bool) {
+    match (executed.contains(&index), index == code.len()) {
+        (true, _) => (acc, false),
+        (_, true) => (acc, true),
+        _ => {
             executed.push(index);
 
             let instruction = code[index];
@@ -86,6 +87,6 @@ mod tests {
     fn test_execute() {
         let code = super::to_codes(create_factory().into_iter());
 
-        assert_eq!(super::execute(code), 5)
+        assert_eq!(super::execute(code), (5, false))
     }
 }

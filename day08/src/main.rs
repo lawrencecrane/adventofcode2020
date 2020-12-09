@@ -7,5 +7,5 @@ use lib::*;
 fn main() {
     let code = to_codes(read_lines("../data/08_input").unwrap().map(|s| s.unwrap()));
 
-    println!("PART 1 | {}", execute(code))
+    println!("PART 1 | {}", execute(code).0)
 }
