@@ -2,7 +2,6 @@ use aoc_utils::*;
 
 mod lib;
 
-use day09::find_contiguous_set_summing_to;
 use lib::*;
 
 fn main() {

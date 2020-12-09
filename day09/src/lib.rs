@@ -1,7 +1,25 @@
-use std::collections::HashSet;
+use std::collections::{HashSet, VecDeque};
 
-pub fn find_contiguous_set_summing_to(sum: usize, numbers: &Vec<usize>) -> Vec<usize> {
-    Vec::new()
+pub fn find_contiguous_set_summing_to(sum: usize, numbers: &Vec<usize>) -> VecDeque<usize> {
+    let (deque, _) = numbers
+        .iter()
+        .fold((VecDeque::new(), 0), |(mut deque, acc), x| {
+            if acc == sum {
+                return (deque, acc);
+            }
+
+            deque.push_back(*x);
+
+            let mut new_acc = acc + x;
+
+            while new_acc > sum {
+                new_acc -= deque.pop_front().unwrap();
+            }
+
+            (deque, new_acc)
+        });
+
+    deque
 }
 
 pub fn find_first_mismatch(numbers: &Vec<usize>, preamble: usize) -> usize {
