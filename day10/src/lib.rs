@@ -1,3 +1,7 @@
+pub fn n_arrangements(adapters: &Vec<usize>) -> usize {
+    0
+}
+
 pub fn count_jolt_differences(adapters: &mut Vec<usize>) -> [usize; 3] {
     adapters.sort();
 
@@ -36,5 +40,11 @@ mod tests {
             super::count_jolt_differences(&mut create_big_factory()),
             [22, 0, 10]
         );
+    }
+
+    #[test]
+    fn test_n_arrangements() {
+        assert_eq!(super::n_arrangements(&create_small_factory()), 8);
+        assert_eq!(super::n_arrangements(&create_big_factory()), 19208);
     }
 }

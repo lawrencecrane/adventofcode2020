@@ -13,4 +13,5 @@ fn main() {
     let counts = count_jolt_differences(&mut data);
 
     println!("PART 1 | {}", counts[0] * counts[2]);
+    println!("PART 2 | {}", n_arrangements(&data));
 }
