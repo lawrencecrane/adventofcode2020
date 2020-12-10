@@ -5,8 +5,10 @@ mod lib;
 use lib::*;
 
 fn main() {
-    let data: Vec<String> = read_lines("../data/10_input")
+    let data: Vec<usize> = read_lines("../data/10_input")
         .unwrap()
-        .map(|s| s.unwrap())
+        .map(|s| s.unwrap().parse().unwrap())
         .collect();
+
+    println!("{:?}", count_jolt_differences(&data));
 }
