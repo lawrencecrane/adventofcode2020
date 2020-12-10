@@ -1,5 +1,15 @@
-pub fn count_jolt_differences(adapters: &Vec<usize>) -> (usize, usize, usize) {
-    (0, 0, 0)
+pub fn count_jolt_differences(adapters: &mut Vec<usize>) -> [usize; 3] {
+    adapters.sort();
+
+    let (_, counts) = adapters
+        .iter()
+        .fold((0, [0, 0, 1]), |(prev, mut counts), adapter| {
+            counts[adapter - prev - 1] += 1;
+
+            (*adapter, counts)
+        });
+
+    counts
 }
 
 #[cfg(test)]
@@ -18,13 +28,13 @@ mod tests {
     #[test]
     fn test_count_jolt_differences() {
         assert_eq!(
-            super::count_jolt_differences(&create_small_factory()),
-            (7, 0, 5)
+            super::count_jolt_differences(&mut create_small_factory()),
+            [7, 0, 5]
         );
 
         assert_eq!(
-            super::count_jolt_differences(&create_big_factory()),
-            (22, 0, 10)
+            super::count_jolt_differences(&mut create_big_factory()),
+            [22, 0, 10]
         );
     }
 }

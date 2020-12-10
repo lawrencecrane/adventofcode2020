@@ -5,10 +5,12 @@ mod lib;
 use lib::*;
 
 fn main() {
-    let data: Vec<usize> = read_lines("../data/10_input")
+    let mut data: Vec<usize> = read_lines("../data/10_input")
         .unwrap()
         .map(|s| s.unwrap().parse().unwrap())
         .collect();
 
-    println!("{:?}", count_jolt_differences(&data));
+    let counts = count_jolt_differences(&mut data);
+
+    println!("PART 1 | {}", counts[0] * counts[2]);
 }
