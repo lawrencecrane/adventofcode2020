@@ -1,8 +1,6 @@
 // Expects the charging outlet and device's built-in adapter to be part of adapters
 pub fn n_arrangements(adapters: &Vec<usize>) -> usize {
-    let arrangements = find_arrangements(adapters, Vec::new());
-
-    arrangements.len() + 1
+    find_arrangements(adapters, Vec::new()) + 1
 }
 
 // Expects the charging outlet and device's built-in adapter to be part of adapters
@@ -20,7 +18,7 @@ pub fn count_jolt_differences(adapters: &Vec<usize>) -> [usize; 3] {
     counts
 }
 
-fn find_arrangements(arrangement: &Vec<usize>, included: Vec<usize>) -> Vec<Vec<usize>> {
+fn find_arrangements(arrangement: &Vec<usize>, included: Vec<usize>) -> usize {
     let mut found = Vec::new();
     let mut arrangements = Vec::new();
 
@@ -37,17 +35,14 @@ fn find_arrangements(arrangement: &Vec<usize>, included: Vec<usize>) -> Vec<Vec<
     }
 
     match found.len() {
-        0 => vec![],
+        0 => 0,
         _ => {
-            let mut acc = arrangements.iter().fold(Vec::new(), |mut acc, x| {
-                acc.append(&mut find_arrangements(arrangement, x.clone()));
+            let acc: usize = arrangements
+                .iter()
+                .map(|x| find_arrangements(arrangement, x.clone()))
+                .sum();
 
-                acc
-            });
-
-            acc.append(&mut arrangements);
-
-            acc
+            acc + arrangements.len()
         }
     }
 }
