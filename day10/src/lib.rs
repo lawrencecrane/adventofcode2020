@@ -1,6 +1,17 @@
 // Expects the charging outlet and device's built-in adapter to be part of adapters
 pub fn n_arrangements(adapters: &Vec<usize>) -> usize {
-    find_arrangements(adapters, Vec::new()) + 1
+    let mut i = 0;
+    let mut arrangements = find_arrangements(adapters, &vec![]).unwrap();
+
+    while i < arrangements.len() {
+        if let Some(mut xs) = find_arrangements(adapters, &arrangements[i]) {
+            arrangements.append(&mut xs);
+        }
+
+        i += 1;
+    }
+
+    arrangements.len() + 1
 }
 
 // Expects the charging outlet and device's built-in adapter to be part of adapters
@@ -18,7 +29,7 @@ pub fn count_jolt_differences(adapters: &Vec<usize>) -> [usize; 3] {
     counts
 }
 
-fn find_arrangements(arrangement: &Vec<usize>, included: Vec<usize>) -> usize {
+fn find_arrangements(arrangement: &Vec<usize>, included: &Vec<usize>) -> Option<Vec<Vec<usize>>> {
     let mut found = Vec::new();
     let mut arrangements = Vec::new();
 
@@ -35,15 +46,8 @@ fn find_arrangements(arrangement: &Vec<usize>, included: Vec<usize>) -> usize {
     }
 
     match found.len() {
-        0 => 0,
-        _ => {
-            let acc: usize = arrangements
-                .iter()
-                .map(|x| find_arrangements(arrangement, x.clone()))
-                .sum();
-
-            acc + arrangements.len()
-        }
+        0 => None,
+        _ => Some(arrangements),
     }
 }
 
@@ -119,5 +123,22 @@ mod tests {
         assert_eq!(super::find_arrangement(&data, 0, &vec![]), Some(1));
         assert_eq!(super::find_arrangement(&data, 1, &vec![1]), Some(2));
         assert_eq!(super::find_arrangement(&data, 2, &vec![1, 2]), None);
+    }
+
+    #[test]
+    fn test_find_arrangements() {
+        let data = vec![0, 1, 2, 3, 4, 7];
+
+        assert_eq!(
+            super::find_arrangements(&data, &vec![]),
+            Some(vec![vec![1], vec![2], vec![3]])
+        );
+
+        assert_eq!(
+            super::find_arrangements(&data, &vec![1]),
+            Some(vec![vec![1, 2], vec![1, 3]])
+        );
+
+        assert_eq!(super::find_arrangements(&data, &vec![1, 2]), None);
     }
 }
