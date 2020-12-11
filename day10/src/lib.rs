@@ -1,4 +1,6 @@
 // Expects the charging outlet and device's built-in adapter to be part of adapters
+// TODO: Okay this seems to be the bruteforce way, with memoization it could work,
+// but I found a hint that the optimal solution has to do with tribonacci sequence, hmm...
 pub fn n_arrangements(adapters: &Vec<usize>) -> usize {
     let mut i = 0;
     let mut arrangements = find_arrangements(adapters, &vec![]).unwrap();
