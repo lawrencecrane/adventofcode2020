@@ -1,6 +1,7 @@
 use aoc_utils::tribonacci::Tribonacci;
 
 // Expects the charging outlet and device's built-in adapter to be part of adapters
+// TODO: I don't get why tribonacci sequence works here, research it and comment here why!
 pub fn n_arrangements(adapters: &Vec<usize>) -> usize {
     let (arrangements, _) = adapters
         .iter()
