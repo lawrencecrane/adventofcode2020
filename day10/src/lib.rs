@@ -52,13 +52,17 @@ fn find_arrangement(arrangement: &Vec<usize>, from: usize, ignored: &Vec<usize>)
         .iter()
         .enumerate()
         .skip(2 + from)
-        .find(
-            |(i, adapter)| match (0..(i - 1)).rev().find(|x| !ignored.contains(x)) {
-                Some(prev) => *adapter - arrangement[prev] <= 3,
-                None => false,
-            },
-        )
-        .map(|(i, _)| i - 1)
+        .find_map(|(i, adapter)| {
+            let mut prevs = (0..i).rev().filter(|x| !ignored.contains(x));
+
+            match (prevs.next(), prevs.next()) {
+                (Some(prev), Some(prevprev)) => match *adapter - arrangement[prevprev] <= 3 {
+                    true => Some(prev),
+                    false => None,
+                },
+                _ => None,
+            }
+        })
 }
 
 // Add the charging outlet and device's built-in adapter to data and sorts it
