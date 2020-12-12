@@ -4,22 +4,32 @@ pub fn simulate(layout: &Layout) -> Layout {
     let seats = get_seat_indices(&layout);
     let max = *seats.last().unwrap().last().unwrap();
 
-    _simulate(layout.clone(), seats, max)
+    let adjacent: Vec<Vec<Vec<(usize, usize)>>> = seats
+        .iter()
+        .map(|row| row.iter().map(|seat| adjacent_seats(seat, &max)).collect())
+        .collect();
+
+    _simulate(layout.clone(), seats, max, adjacent)
 }
 
-fn _simulate(previous: Layout, seats: Vec<Vec<(usize, usize)>>, max: (usize, usize)) -> Layout {
+fn _simulate(
+    previous: Layout,
+    seats: Vec<Vec<(usize, usize)>>,
+    max: (usize, usize),
+    adjacent: Vec<Vec<Vec<(usize, usize)>>>,
+) -> Layout {
     let next: Vec<Vec<Position>> = seats
         .iter()
         .map(|row| {
             row.iter()
-                .map(|seat| next_state(seat, &previous, &max))
+                .map(|seat| next_state(seat, &previous, &adjacent[seat.0][seat.1]))
                 .collect()
         })
         .collect();
 
     match next == previous {
         true => next,
-        false => _simulate(next, seats, max),
+        false => _simulate(next, seats, max, adjacent),
     }
 }
 
@@ -31,12 +41,12 @@ fn get_seat_indices(layout: &Layout) -> Vec<Vec<(usize, usize)>> {
         .collect()
 }
 
-fn next_state(seat: &(usize, usize), layout: &Layout, max: &(usize, usize)) -> Position {
+fn next_state(seat: &(usize, usize), layout: &Layout, adjacent: &Vec<(usize, usize)>) -> Position {
     if layout[seat.0][seat.1] == Position::FLOOR {
         return Position::FLOOR;
     }
 
-    let noccupied = adjacent_seats(seat, max)
+    let noccupied = adjacent
         .iter()
         .filter(|(x, y)| layout[*x][*y] == Position::OCCUPIED)
         .count();
