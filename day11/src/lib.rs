@@ -7,37 +7,43 @@ pub fn simulate(layout: &Layout) -> Layout {
         .map(|(k, _)| (*k, adjacent_seats(k, layout)))
         .collect();
 
-    _simulate(layout.clone(), adjacent_map)
+    _simulate(layout.clone(), adjacent_map, 4)
 }
 
 fn _simulate(
     previous: Layout,
     adjacent_map: HashMap<(usize, usize), Vec<(usize, usize)>>,
+    nmax_adjacent: usize,
 ) -> Layout {
     let next: Layout = previous
         .iter()
         .map(|(k, seat)| {
             (
                 *k,
-                next_state(seat, &previous, adjacent_map.get(k).unwrap()),
+                next_state(seat, &previous, adjacent_map.get(k).unwrap(), nmax_adjacent),
             )
         })
         .collect();
 
     match next == previous {
         true => next,
-        false => _simulate(next, adjacent_map),
+        false => _simulate(next, adjacent_map, nmax_adjacent),
     }
 }
 
-fn next_state(seat: &Seat, layout: &Layout, adjacent: &Vec<(usize, usize)>) -> Seat {
+fn next_state(
+    seat: &Seat,
+    layout: &Layout,
+    adjacent: &Vec<(usize, usize)>,
+    nmax_adjacent: usize,
+) -> Seat {
     match adjacent
         .iter()
         .filter(|(x, y)| layout.get(&(*x, *y)).unwrap() == &Seat::OCCUPIED)
         .count()
     {
         0 => Seat::OCCUPIED,
-        n if n >= 4 => Seat::EMPTY,
+        n if n >= nmax_adjacent => Seat::EMPTY,
         _ => *seat,
     }
 }
