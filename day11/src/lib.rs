@@ -42,18 +42,23 @@ fn next_state(
     }
 }
 
+// We only need to find right, bottom, and downward diagonal points while iterating over points
+// as we "mutually insert" these points. Thus left, top, upward diagonals are generated at the same time
+// I.e. (0, 0)'s downward diagonal is (1, 1), we do not need to search (1, 1)'s upward diagonal as it has to be (0, 0)
 fn adjacent_seats(layout: &Layout, max_distance: isize) -> AdjacentMap {
     let points = layout.keys().collect::<Vec<&(isize, isize)>>();
 
     points.iter().fold(HashMap::new(), |mut m, point| {
         let is_valid = |p: &&&(isize, isize)| *p != point && is_in_range(point, p, &max_distance);
-        let compare = |x, y| delta(point, x).cmp(&delta(point, y));
+        let closest = |x, y| delta(point, x).cmp(&delta(point, y));
+
+        // TODO: There has to be better way to find right, bottom, and downward diagonal points!
 
         if let Some(right) = points
             .iter()
             .filter(is_valid)
             .filter(|(x, y)| x == &point.0 && y > &point.1)
-            .min_by(|a, b| compare(a, b))
+            .min_by(|a, b| closest(a, b))
         {
             m.mutually_insert(**point, **right);
         }
@@ -62,7 +67,7 @@ fn adjacent_seats(layout: &Layout, max_distance: isize) -> AdjacentMap {
             .iter()
             .filter(is_valid)
             .filter(|(x, y)| y == &point.1 && x > &point.0)
-            .min_by(|a, b| compare(a, b))
+            .min_by(|a, b| closest(a, b))
         {
             m.mutually_insert(**point, **bottom);
         }
@@ -71,7 +76,7 @@ fn adjacent_seats(layout: &Layout, max_distance: isize) -> AdjacentMap {
             .iter()
             .filter(is_valid)
             .filter(|p| is_diagonal(point, p, |xd, yd| yd > 0 && xd > 0))
-            .min_by(|a, b| compare(a, b))
+            .min_by(|a, b| closest(a, b))
         {
             m.mutually_insert(**point, **br_diag);
         }
@@ -80,7 +85,7 @@ fn adjacent_seats(layout: &Layout, max_distance: isize) -> AdjacentMap {
             .iter()
             .filter(is_valid)
             .filter(|p| is_diagonal(point, p, |xd, yd| yd > 0 && xd < 0))
-            .min_by(|a, b| compare(a, b))
+            .min_by(|a, b| closest(a, b))
         {
             m.mutually_insert(**point, **bl_diag);
         }
