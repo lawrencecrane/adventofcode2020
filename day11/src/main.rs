@@ -12,5 +12,8 @@ fn main() {
             .collect(),
     );
 
-    println!("PART 1 | {}", noccupied(&simulate(&data)));
+    println!(
+        "PART 1 | {}",
+        noccupied(&simulate_with_immediate_adjacent_seats(&data))
+    );
 }

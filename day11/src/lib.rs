@@ -1,10 +1,10 @@
 use itertools::Itertools;
 use std::collections::HashMap;
 
-pub fn simulate(layout: &Layout) -> Layout {
+pub fn simulate_with_immediate_adjacent_seats(layout: &Layout) -> Layout {
     let adjacent_map: HashMap<(usize, usize), Vec<(usize, usize)>> = layout
         .iter()
-        .map(|(k, _)| (*k, adjacent_seats(k, layout)))
+        .map(|(k, _)| (*k, immediate_adjacent_seats(k, layout)))
         .collect();
 
     _simulate(layout.clone(), adjacent_map, 4)
@@ -48,7 +48,7 @@ fn next_state(
     }
 }
 
-fn adjacent_seats(point: &(usize, usize), layout: &Layout) -> Vec<(usize, usize)> {
+fn immediate_adjacent_seats(point: &(usize, usize), layout: &Layout) -> Vec<(usize, usize)> {
     let (x, y) = (point.0 as isize, point.1 as isize);
 
     ((x - 1)..(x + 2))
@@ -124,6 +124,9 @@ mod tests {
     fn test_simulate() {
         let layout = create_factory();
 
-        assert_eq!(super::noccupied(&super::simulate(&layout)), 37);
+        assert_eq!(
+            super::noccupied(&super::simulate_with_immediate_adjacent_seats(&layout)),
+            37
+        );
     }
 }
