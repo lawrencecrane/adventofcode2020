@@ -26,13 +26,12 @@ fn n_arrangements(adapters: &Adapters) -> usize {
         .fold(PathMap::new(), |mut paths, adapter| {
             let norigin = *paths.data.get(adapter).unwrap_or(&0);
 
-            (1..4).for_each(|diff| {
-                let next = adapter + diff;
-
-                if adapters.data.contains(&(next)) {
+            (1..4)
+                .map(|diff| adapter + diff)
+                .filter(|next| adapters.data.contains(&next))
+                .for_each(|next| {
                     *paths.data.entry(next).or_insert(0) += norigin;
-                }
-            });
+                });
 
             paths
         });
