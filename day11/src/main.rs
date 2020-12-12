@@ -12,5 +12,5 @@ fn main() {
             .collect(),
     );
 
-    println!("{:?}", data);
+    println!("PART 1 | {}", noccupied(&simulate(data)));
 }

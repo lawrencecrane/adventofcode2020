@@ -1,4 +1,12 @@
-pub fn to_layout(data: &Vec<String>) -> Vec<Vec<Position>> {
+pub fn simulate(layout: Layout) -> Layout {
+    layout
+}
+
+pub fn noccupied(layout: &Layout) -> usize {
+    0
+}
+
+pub fn to_layout(data: &Vec<String>) -> Layout {
     data.iter()
         .map(|row| {
             row.chars()
@@ -7,6 +15,8 @@ pub fn to_layout(data: &Vec<String>) -> Vec<Vec<Position>> {
         })
         .collect()
 }
+
+type Layout = Vec<Vec<Position>>;
 
 impl Position {
     fn from_char(x: char) -> Option<Position> {
@@ -28,7 +38,7 @@ pub enum Position {
 
 #[cfg(test)]
 mod tests {
-    fn create_factory() -> Vec<Vec<super::Position>> {
+    fn create_factory() -> super::Layout {
         super::to_layout(
             &vec![
                 "L.LL.LL.LL",
@@ -49,5 +59,9 @@ mod tests {
     }
 
     #[test]
-    fn test_() {}
+    fn test_simulate() {
+        let layout = create_factory();
+
+        assert_eq!(super::noccupied(&super::simulate(layout)), 37);
+    }
 }
