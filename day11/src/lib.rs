@@ -2,23 +2,31 @@ use itertools::Itertools;
 use std::collections::HashMap;
 
 pub fn simulate(layout: &Layout) -> Layout {
-    let adjacent: HashMap<(usize, usize), Vec<(usize, usize)>> = layout
+    let adjacent_map: HashMap<(usize, usize), Vec<(usize, usize)>> = layout
         .iter()
         .map(|(k, _)| (*k, adjacent_seats(k, layout)))
         .collect();
 
-    _simulate(layout.clone(), adjacent)
+    _simulate(layout.clone(), adjacent_map)
 }
 
-fn _simulate(previous: Layout, adjacent: HashMap<(usize, usize), Vec<(usize, usize)>>) -> Layout {
+fn _simulate(
+    previous: Layout,
+    adjacent_map: HashMap<(usize, usize), Vec<(usize, usize)>>,
+) -> Layout {
     let next: Layout = previous
         .iter()
-        .map(|(k, seat)| (*k, next_state(seat, &previous, adjacent.get(k).unwrap())))
+        .map(|(k, seat)| {
+            (
+                *k,
+                next_state(seat, &previous, adjacent_map.get(k).unwrap()),
+            )
+        })
         .collect();
 
     match next == previous {
         true => next,
-        false => _simulate(next, adjacent),
+        false => _simulate(next, adjacent_map),
     }
 }
 
