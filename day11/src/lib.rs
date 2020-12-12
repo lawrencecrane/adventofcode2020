@@ -1,64 +1,40 @@
 use itertools::Itertools;
+use std::collections::HashMap;
 
 pub fn simulate(layout: &Layout) -> Layout {
-    let seats = get_seat_indices(&layout);
-    let max = *seats.last().unwrap().last().unwrap();
-
-    let adjacent: Vec<Vec<Vec<(usize, usize)>>> = seats
+    let adjacent: HashMap<(usize, usize), Vec<(usize, usize)>> = layout
         .iter()
-        .map(|row| row.iter().map(|seat| adjacent_seats(seat, &max)).collect())
+        .map(|(k, _)| (*k, adjacent_seats(k, layout)))
         .collect();
 
-    _simulate(layout.clone(), seats, max, adjacent)
+    _simulate(layout.clone(), adjacent)
 }
 
-fn _simulate(
-    previous: Layout,
-    seats: Vec<Vec<(usize, usize)>>,
-    max: (usize, usize),
-    adjacent: Vec<Vec<Vec<(usize, usize)>>>,
-) -> Layout {
-    let next: Vec<Vec<Position>> = seats
+fn _simulate(previous: Layout, adjacent: HashMap<(usize, usize), Vec<(usize, usize)>>) -> Layout {
+    let next: Layout = previous
         .iter()
-        .map(|row| {
-            row.iter()
-                .map(|seat| next_state(seat, &previous, &adjacent[seat.0][seat.1]))
-                .collect()
-        })
+        .map(|(k, seat)| (*k, next_state(seat, &previous, adjacent.get(k).unwrap())))
         .collect();
 
     match next == previous {
         true => next,
-        false => _simulate(next, seats, max, adjacent),
+        false => _simulate(next, adjacent),
     }
 }
 
-fn get_seat_indices(layout: &Layout) -> Vec<Vec<(usize, usize)>> {
-    layout
+fn next_state(seat: &Seat, layout: &Layout, adjacent: &Vec<(usize, usize)>) -> Seat {
+    match adjacent
         .iter()
-        .enumerate()
-        .map(|(x, row)| row.iter().enumerate().map(|(y, _)| (x, y)).collect())
-        .collect()
-}
-
-fn next_state(seat: &(usize, usize), layout: &Layout, adjacent: &Vec<(usize, usize)>) -> Position {
-    if layout[seat.0][seat.1] == Position::FLOOR {
-        return Position::FLOOR;
-    }
-
-    let noccupied = adjacent
-        .iter()
-        .filter(|(x, y)| layout[*x][*y] == Position::OCCUPIED)
-        .count();
-
-    match noccupied {
-        0 => Position::OCCUPIED,
-        x if x >= 4 => Position::EMPTY,
-        _ => layout[seat.0][seat.1],
+        .filter(|(x, y)| layout.get(&(*x, *y)).unwrap() == &Seat::OCCUPIED)
+        .count()
+    {
+        0 => Seat::OCCUPIED,
+        n if n >= 4 => Seat::EMPTY,
+        _ => *seat,
     }
 }
 
-fn adjacent_seats(point: &(usize, usize), max: &(usize, usize)) -> Vec<(usize, usize)> {
+fn adjacent_seats(point: &(usize, usize), layout: &Layout) -> Vec<(usize, usize)> {
     let (x, y) = (point.0 as isize, point.1 as isize);
 
     ((x - 1)..(x + 2))
@@ -66,7 +42,7 @@ fn adjacent_seats(point: &(usize, usize), max: &(usize, usize)) -> Vec<(usize, u
         .filter(|a| match a {
             p if p == &(x, y) => false,
             p if p.0 < 0 || p.1 < 0 => false,
-            p if p.0 > max.0 as isize || p.1 > max.1 as isize => false,
+            p if !layout.contains_key(&(p.0 as usize, p.1 as usize)) => false,
             _ => true,
         })
         .map(|(x, y)| (x as usize, y as usize))
@@ -74,44 +50,38 @@ fn adjacent_seats(point: &(usize, usize), max: &(usize, usize)) -> Vec<(usize, u
 }
 
 pub fn noccupied(layout: &Layout) -> usize {
-    layout
-        .iter()
-        .map(|row| {
-            row.iter()
-                .filter(|seat| **seat == Position::OCCUPIED)
-                .count()
-        })
-        .sum()
+    layout.values().filter(|x| x == &&Seat::OCCUPIED).count()
 }
 
 pub fn to_layout(data: &Vec<String>) -> Layout {
     data.iter()
-        .map(|row| {
+        .enumerate()
+        .flat_map(|(x, row)| {
             row.chars()
-                .map(|c| Position::from_char(c).unwrap())
-                .collect()
+                .enumerate()
+                .map(move |(y, c)| ((x, y), Seat::from_char(c)))
+                .filter(|(_, seat)| seat.is_some())
+                .map(|(pos, seat)| (pos, seat.unwrap()))
         })
         .collect()
 }
 
-type Layout = Vec<Vec<Position>>;
+type Layout = HashMap<(usize, usize), Seat>;
 
-impl Position {
-    fn from_char(x: char) -> Option<Position> {
+impl Seat {
+    fn from_char(x: char) -> Option<Seat> {
         match x {
-            'L' => Some(Position::EMPTY),
-            '#' => Some(Position::OCCUPIED),
-            '.' => Some(Position::FLOOR),
+            'L' => Some(Seat::EMPTY),
+            '#' => Some(Seat::OCCUPIED),
             _ => None,
         }
     }
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
-pub enum Position {
+pub enum Seat {
     EMPTY,
     OCCUPIED,
-    FLOOR,
 }
 
 #[cfg(test)]
