@@ -8,3 +8,6 @@ edition = "2018"
 
 [dependencies.aoc-utils]
 path = "../aoc-utils"
+
+[dependencies]
+itertools = "0.9.0"
