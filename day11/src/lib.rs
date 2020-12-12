@@ -54,7 +54,7 @@ fn adjacent_seats(layout: &Layout, max_distance: isize) -> AdjacentMap {
         if let Some(right) = points
             .iter()
             .filter(is_valid)
-            .filter(|(_, y)| y == &point.1)
+            .filter(|(x, y)| x == &point.0 && y > &point.1)
             .min_by(|a, b| compare(a, b))
         {
             m.mutually_insert(**point, **right);
@@ -63,7 +63,7 @@ fn adjacent_seats(layout: &Layout, max_distance: isize) -> AdjacentMap {
         if let Some(bottom) = points
             .iter()
             .filter(is_valid)
-            .filter(|(x, _)| x == &point.0)
+            .filter(|(x, y)| y == &point.1 && x > &point.0)
             .min_by(|a, b| compare(a, b))
         {
             m.mutually_insert(**point, **bottom);
@@ -192,6 +192,22 @@ mod tests {
         assert_eq!(
             super::noccupied(&super::simulate(&layout, 5, std::isize::MAX)),
             26
+        );
+    }
+
+    #[test]
+    fn test_adjacent_seats() {
+        let adjacent_map = super::adjacent_seats(&create_factory(), std::isize::MAX);
+
+        assert_eq!(adjacent_map.values().all(|xs| xs.len() <= 8), true);
+
+        let set = adjacent_map.get(&(0, 3)).unwrap();
+
+        assert_eq!(
+            vec![(0, 2), (0, 5), (1, 2), (1, 3), (1, 4)]
+                .iter()
+                .all(|x| set.contains(x)),
+            true
         );
     }
 }
