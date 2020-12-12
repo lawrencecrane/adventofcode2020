@@ -3,7 +3,14 @@ pub fn simulate(layout: Layout) -> Layout {
 }
 
 pub fn noccupied(layout: &Layout) -> usize {
-    0
+    layout
+        .iter()
+        .map(|row| {
+            row.iter()
+                .filter(|seat| **seat == Position::OCCUPIED)
+                .count()
+        })
+        .sum()
 }
 
 pub fn to_layout(data: &Vec<String>) -> Layout {
