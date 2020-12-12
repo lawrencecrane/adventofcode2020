@@ -13,4 +13,9 @@ fn main() {
     );
 
     println!("PART 1 | {}", noccupied(&simulate(&data, 4, 1)));
+
+    println!(
+        "PART 2 | {}",
+        noccupied(&simulate(&data, 5, std::isize::MAX))
+    );
 }
