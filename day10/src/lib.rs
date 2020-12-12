@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::collections::HashMap;
 
 impl Adapters {
@@ -23,15 +24,13 @@ fn n_arrangements(adapters: &Adapters) -> usize {
     let paths = adapters
         .data
         .iter()
-        .fold(PathMap::new(), |mut paths, adapter| {
-            let norigin = *paths.data.get(adapter).unwrap_or(&0);
+        .cartesian_product(1..4)
+        .map(|(adapter, diff)| (adapter, adapter + diff))
+        .filter(|(_, next)| adapters.data.contains(next))
+        .fold(PathMap::new(), |mut paths, (adapter, next)| {
+            let n_origin = *paths.data.get(adapter).unwrap_or(&0);
 
-            (1..4)
-                .map(|diff| adapter + diff)
-                .filter(|next| adapters.data.contains(&next))
-                .for_each(|next| {
-                    *paths.data.entry(next).or_insert(0) += norigin;
-                });
+            *paths.data.entry(next).or_insert(0) += n_origin;
 
             paths
         });
