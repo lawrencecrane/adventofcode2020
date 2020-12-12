@@ -5,15 +5,15 @@ mod lib;
 use lib::*;
 
 fn main() {
-    let mut data: Vec<usize> = read_lines("../data/10_input")
-        .unwrap()
-        .map(|s| s.unwrap().parse().unwrap())
-        .collect();
+    let adapters = Adapters::new(
+        read_lines("../data/10_input")
+            .unwrap()
+            .map(|s| s.unwrap().parse().unwrap())
+            .collect(),
+    );
 
-    prepare(&mut data);
-
-    let counts = count_jolt_differences(&data);
+    let counts = adapters.count_jolt_differences();
 
     println!("PART 1 | {}", counts[0] * counts[2]);
-    println!("PART 2 | {}", n_arrangements(&data));
+    println!("PART 2 | {}", adapters.n_arrangements());
 }

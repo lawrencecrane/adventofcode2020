@@ -1,11 +1,28 @@
 use aoc_utils::tribonacci::Tribonacci;
 
-// Expects the charging outlet and device's built-in adapter to be part of adapters
-// TODO: I don't get why tribonacci sequence works here, research it and comment here why!
-pub fn n_arrangements(adapters: &Vec<usize>) -> usize {
-    let (arrangements, _) = adapters.iter().fold(
+impl Adapters {
+    // Add the charging outlet and device's built-in adapter to data and sorts it
+    pub fn new(mut data: Vec<usize>) -> Self {
+        data.push(0);
+        data.push(*data.iter().max().unwrap() + 3);
+        data.sort();
+
+        Self { data }
+    }
+
+    pub fn count_jolt_differences(&self) -> [usize; 3] {
+        count_jolt_differences(self)
+    }
+
+    pub fn n_arrangements(&self) -> usize {
+        n_arrangements(self)
+    }
+}
+
+fn n_arrangements(adapters: &Adapters) -> usize {
+    let (arrangements, _) = adapters.data.iter().fold(
         (1, 1),
-        |(arrangements, nconsecutive), adapter| match adapters.contains(&(adapter + 1)) {
+        |(arrangements, nconsecutive), adapter| match adapters.data.contains(&(adapter + 1)) {
             true => (arrangements, nconsecutive + 1),
             false => (
                 // From tribonacci sequence, starting: 1, 1, 2, 4... take the nth
@@ -25,10 +42,10 @@ pub fn n_arrangements(adapters: &Vec<usize>) -> usize {
     arrangements
 }
 
-// Expects the charging outlet and device's built-in adapter to be part of adapters
-pub fn count_jolt_differences(adapters: &Vec<usize>) -> [usize; 3] {
+fn count_jolt_differences(adapters: &Adapters) -> [usize; 3] {
     let (_, counts) =
         adapters
+            .data
             .iter()
             .skip(1)
             .fold((0, [0, 0, 0]), |(prev, mut counts), adapter| {
@@ -40,32 +57,23 @@ pub fn count_jolt_differences(adapters: &Vec<usize>) -> [usize; 3] {
     counts
 }
 
-// Add the charging outlet and device's built-in adapter to data and sorts it
-pub fn prepare(data: &mut Vec<usize>) {
-    data.push(0);
-    data.push(*data.iter().max().unwrap() + 3);
-    data.sort();
+pub struct Adapters {
+    data: Vec<usize>,
 }
 
 #[cfg(test)]
 mod tests {
-    fn create_small_factory() -> Vec<usize> {
-        let mut data = vec![16, 10, 15, 5, 1, 11, 7, 19, 6, 12, 4];
+    use super::Adapters;
 
-        super::prepare(&mut data);
-
-        data
+    fn create_small_factory() -> Adapters {
+        Adapters::new(vec![16, 10, 15, 5, 1, 11, 7, 19, 6, 12, 4])
     }
 
-    fn create_big_factory() -> Vec<usize> {
-        let mut data = vec![
+    fn create_big_factory() -> Adapters {
+        Adapters::new(vec![
             28, 33, 18, 42, 31, 14, 46, 20, 48, 47, 24, 23, 49, 45, 19, 38, 39, 11, 1, 32, 25, 35,
             8, 17, 7, 9, 4, 2, 34, 10, 3,
-        ];
-
-        super::prepare(&mut data);
-
-        data
+        ])
     }
 
     #[test]
