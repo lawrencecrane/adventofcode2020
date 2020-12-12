@@ -1,7 +1,7 @@
 use aoc_utils::tribonacci::Tribonacci;
 
 impl Adapters {
-    // Add the charging outlet and device's built-in adapter to data and sorts it
+    // Adds the charging outlet and device's built-in adapter to data and sorts it
     pub fn new(mut data: Vec<usize>) -> Self {
         data.push(0);
         data.push(*data.iter().max().unwrap() + 3);
@@ -93,5 +93,16 @@ mod tests {
     fn test_n_arrangements() {
         assert_eq!(super::n_arrangements(&create_small_factory()), 8);
         assert_eq!(super::n_arrangements(&create_big_factory()), 19208);
+
+        // [0, 2, 3, 6] and [0, 3, 6]
+        assert_eq!(super::n_arrangements(&Adapters::new(vec![2, 3])), 2);
+
+        // Can start with: [0, 2, 3, 4], [0, 3, 4], [0, 2 ,4]
+        // Can end with: [7, 8, 9, 12], [7, 9, 12]
+        // Combinations: 3 * 2 = 6
+        assert_eq!(
+            super::n_arrangements(&Adapters::new(vec![2, 3, 4, 7, 8, 9])),
+            6
+        );
     }
 }
