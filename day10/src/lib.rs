@@ -27,28 +27,28 @@ fn n_arrangements(adapters: &Adapters) -> usize {
         .cartesian_product(1..4)
         .map(|(adapter, diff)| (adapter, adapter + diff))
         .filter(|(_, next)| adapters.data.contains(next))
-        .fold(PathMap::new(), |mut paths, (adapter, next)| {
-            let n_origin = *paths.data.get(adapter).unwrap_or(&0);
+        .fold(HashMap::pathmap(), |mut paths, (adapter, next)| {
+            let n_origin = *paths.get(adapter).unwrap_or(&0);
 
-            *paths.data.entry(next).or_insert(0) += n_origin;
+            *paths.entry(next).or_insert(0) += n_origin;
 
             paths
         });
 
-    *paths.data.get(adapters.data.last().unwrap()).unwrap_or(&0)
+    *paths.get(adapters.data.last().unwrap()).unwrap_or(&0)
 }
 
-impl PathMap {
-    fn new() -> Self {
-        let mut data = HashMap::new();
-        data.insert(0, 1);
+trait PathMap {
+    fn pathmap() -> Self;
+}
 
-        Self { data }
+impl PathMap for HashMap<usize, usize> {
+    fn pathmap() -> Self {
+        let mut pathmap = HashMap::new();
+        pathmap.insert(0, 1);
+
+        pathmap
     }
-}
-
-struct PathMap {
-    data: HashMap<usize, usize>,
 }
 
 fn count_jolt_differences(adapters: &Adapters) -> [usize; 3] {
