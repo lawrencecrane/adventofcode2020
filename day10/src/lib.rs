@@ -1,4 +1,4 @@
-use aoc_utils::tribonacci::Tribonacci;
+use std::collections::HashMap;
 
 impl Adapters {
     // Adds the charging outlet and device's built-in adapter to data and sorts it
@@ -20,26 +20,37 @@ impl Adapters {
 }
 
 fn n_arrangements(adapters: &Adapters) -> usize {
-    let (arrangements, _) = adapters.data.iter().fold(
-        (1, 1),
-        |(arrangements, nconsecutive), adapter| match adapters.data.contains(&(adapter + 1)) {
-            true => (arrangements, nconsecutive + 1),
-            false => (
-                // From tribonacci sequence, starting: 1, 1, 2, 4... take the nth
-                // where nth is the number of consecutive numbers we have seen
-                arrangements
-                    * Tribonacci {}
-                        .into_iter()
-                        .filter(|x| *x > 0)
-                        .take(nconsecutive)
-                        .last()
-                        .unwrap(),
-                1,
-            ),
-        },
-    );
+    let paths = adapters
+        .data
+        .iter()
+        .fold(PathMap::new(), |mut paths, adapter| {
+            let norigin = *paths.data.get(adapter).unwrap_or(&0);
 
-    arrangements
+            (1..4).for_each(|diff| {
+                let next = adapter + diff;
+
+                if adapters.data.contains(&(next)) {
+                    *paths.data.entry(next).or_insert(0) += norigin;
+                }
+            });
+
+            paths
+        });
+
+    *paths.data.get(adapters.data.last().unwrap()).unwrap_or(&0)
+}
+
+impl PathMap {
+    fn new() -> Self {
+        let mut data = HashMap::new();
+        data.insert(0, 1);
+
+        Self { data }
+    }
+}
+
+struct PathMap {
+    data: HashMap<usize, usize>,
 }
 
 fn count_jolt_differences(adapters: &Adapters) -> [usize; 3] {
