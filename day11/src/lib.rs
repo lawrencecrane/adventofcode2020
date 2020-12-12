@@ -43,9 +43,7 @@ fn next_state(
 }
 
 fn adjacent_seats(layout: &Layout, max_distance: isize) -> AdjacentMap {
-    let mut points = layout.keys().collect::<Vec<&(isize, isize)>>();
-
-    points.sort();
+    let points = layout.keys().collect::<Vec<&(isize, isize)>>();
 
     points.iter().fold(HashMap::new(), |mut m, point| {
         let is_valid = |p: &&&(isize, isize)| *p != point && is_in_range(point, p, &max_distance);
