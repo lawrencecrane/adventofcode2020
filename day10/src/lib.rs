@@ -3,17 +3,24 @@ use aoc_utils::tribonacci::Tribonacci;
 // Expects the charging outlet and device's built-in adapter to be part of adapters
 // TODO: I don't get why tribonacci sequence works here, research it and comment here why!
 pub fn n_arrangements(adapters: &Vec<usize>) -> usize {
-    let (arrangements, _) = adapters
-        .iter()
-        .fold((1, 1), |(arrangements, nrun), adapter| {
-            match adapters.contains(&(adapter + 1)) {
-                true => (arrangements, nrun + 1),
-                false => (
-                    arrangements * Tribonacci {}.into_iter().take(nrun + 1).last().unwrap(),
-                    1,
-                ),
-            }
-        });
+    let (arrangements, _) = adapters.iter().fold(
+        (1, 1),
+        |(arrangements, nconsecutive), adapter| match adapters.contains(&(adapter + 1)) {
+            true => (arrangements, nconsecutive + 1),
+            false => (
+                // From tribonacci sequence, starting: 1, 1, 2, 4... take the nth
+                // where nth is the number of consecutive numbers we have seen
+                arrangements
+                    * Tribonacci {}
+                        .into_iter()
+                        .filter(|x| *x > 0)
+                        .take(nconsecutive)
+                        .last()
+                        .unwrap(),
+                1,
+            ),
+        },
+    );
 
     arrangements
 }
