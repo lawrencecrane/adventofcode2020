@@ -2,7 +2,7 @@ use itertools::Itertools;
 use std::collections::HashMap;
 
 pub fn simulate_with_immediate_adjacent_seats(layout: &Layout) -> Layout {
-    let adjacent_map: HashMap<(usize, usize), Vec<(usize, usize)>> = layout
+    let adjacent_map: HashMap<(isize, isize), Vec<(isize, isize)>> = layout
         .iter()
         .map(|(k, _)| (*k, immediate_adjacent_seats(k, layout)))
         .collect();
@@ -12,7 +12,7 @@ pub fn simulate_with_immediate_adjacent_seats(layout: &Layout) -> Layout {
 
 fn _simulate(
     previous: Layout,
-    adjacent_map: HashMap<(usize, usize), Vec<(usize, usize)>>,
+    adjacent_map: HashMap<(isize, isize), Vec<(isize, isize)>>,
     nmax_adjacent: usize,
 ) -> Layout {
     let next: Layout = previous
@@ -34,7 +34,7 @@ fn _simulate(
 fn next_state(
     seat: &Seat,
     layout: &Layout,
-    adjacent: &Vec<(usize, usize)>,
+    adjacent: &Vec<(isize, isize)>,
     nmax_adjacent: usize,
 ) -> Seat {
     match adjacent
@@ -48,18 +48,13 @@ fn next_state(
     }
 }
 
-fn immediate_adjacent_seats(point: &(usize, usize), layout: &Layout) -> Vec<(usize, usize)> {
-    let (x, y) = (point.0 as isize, point.1 as isize);
-
-    ((x - 1)..(x + 2))
-        .cartesian_product((y - 1)..(y + 2))
+fn immediate_adjacent_seats(point: &(isize, isize), layout: &Layout) -> Vec<(isize, isize)> {
+    ((point.0 - 1)..(point.0 + 2))
+        .cartesian_product((point.1 - 1)..(point.1 + 2))
         .filter(|a| match a {
-            p if p == &(x, y) => false,
-            p if p.0 < 0 || p.1 < 0 => false,
-            p if !layout.contains_key(&(p.0 as usize, p.1 as usize)) => false,
-            _ => true,
+            p if p == point => false,
+            p => layout.contains_key(p),
         })
-        .map(|(x, y)| (x as usize, y as usize))
         .collect()
 }
 
@@ -73,14 +68,14 @@ pub fn to_layout(data: &Vec<String>) -> Layout {
         .flat_map(|(x, row)| {
             row.chars()
                 .enumerate()
-                .map(move |(y, c)| ((x, y), Seat::from_char(c)))
+                .map(move |(y, c)| ((x as isize, y as isize), Seat::from_char(c)))
                 .filter(|(_, seat)| seat.is_some())
                 .map(|(pos, seat)| (pos, seat.unwrap()))
         })
         .collect()
 }
 
-type Layout = HashMap<(usize, usize), Seat>;
+type Layout = HashMap<(isize, isize), Seat>;
 
 impl Seat {
     fn from_char(x: char) -> Option<Seat> {
