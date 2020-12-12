@@ -1,10 +1,10 @@
 use std::collections::{HashMap, HashSet};
 
-pub fn simulate(layout: &Layout, max_adjacent_distance: isize) -> Layout {
+pub fn simulate(layout: &Layout, nmax_adjacent: usize, max_adjacent_distance: isize) -> Layout {
     _simulate(
         layout.clone(),
         adjacent_seats(layout, max_adjacent_distance),
-        4,
+        nmax_adjacent,
     )
 }
 
@@ -49,19 +49,31 @@ fn adjacent_seats(layout: &Layout, max_distance: isize) -> AdjacentMap {
 
     points.iter().fold(HashMap::new(), |mut m, point| {
         let is_valid = |p: &&&(isize, isize)| *p != point && is_in_range(point, p, &max_distance);
+        let compare = |x, y| delta(point, x).cmp(&delta(point, y));
 
-        if let Some(right) = points.iter().filter(is_valid).find(|(_, y)| y == &point.1) {
+        if let Some(right) = points
+            .iter()
+            .filter(is_valid)
+            .filter(|(_, y)| y == &point.1)
+            .min_by(|a, b| compare(a, b))
+        {
             m.mutually_insert(**point, **right);
         }
 
-        if let Some(bottom) = points.iter().filter(is_valid).find(|(x, _)| x == &point.0) {
+        if let Some(bottom) = points
+            .iter()
+            .filter(is_valid)
+            .filter(|(x, _)| x == &point.0)
+            .min_by(|a, b| compare(a, b))
+        {
             m.mutually_insert(**point, **bottom);
         }
 
         if let Some(br_diag) = points
             .iter()
             .filter(is_valid)
-            .find(|p| is_diagonal(point, p, |xd, yd| yd > 0 && xd > 0))
+            .filter(|p| is_diagonal(point, p, |xd, yd| yd > 0 && xd > 0))
+            .min_by(|a, b| compare(a, b))
         {
             m.mutually_insert(**point, **br_diag);
         }
@@ -69,7 +81,8 @@ fn adjacent_seats(layout: &Layout, max_distance: isize) -> AdjacentMap {
         if let Some(bl_diag) = points
             .iter()
             .filter(is_valid)
-            .find(|p| is_diagonal(point, p, |xd, yd| yd > 0 && xd < 0))
+            .filter(|p| is_diagonal(point, p, |xd, yd| yd > 0 && xd < 0))
+            .min_by(|a, b| compare(a, b))
         {
             m.mutually_insert(**point, **bl_diag);
         }
@@ -92,7 +105,12 @@ where
 }
 
 fn is_in_range(origin: &(isize, isize), point: &(isize, isize), max_distance: &isize) -> bool {
-    (point.0 - origin.0).abs() <= *max_distance && (point.1 - origin.1).abs() <= *max_distance
+    let (xd, yd) = delta(origin, point);
+    xd <= *max_distance && yd <= *max_distance
+}
+
+fn delta(origin: &(isize, isize), point: &(isize, isize)) -> (isize, isize) {
+    ((point.0 - origin.0).abs(), (point.1 - origin.1).abs())
 }
 
 trait MutuallyInsert {
@@ -169,6 +187,11 @@ mod tests {
     fn test_simulate() {
         let layout = create_factory();
 
-        assert_eq!(super::noccupied(&super::simulate(&layout, 1)), 37);
+        assert_eq!(super::noccupied(&super::simulate(&layout, 4, 1)), 37);
+
+        assert_eq!(
+            super::noccupied(&super::simulate(&layout, 5, std::isize::MAX)),
+            26
+        );
     }
 }
