@@ -1,7 +1,12 @@
 use std::iter::Iterator;
 
 pub fn find_earliest(timetable: &Timetable) -> (usize, usize) {
-    (0, 0)
+    timetable
+        .bus_ids
+        .iter()
+        .map(|id| (*id, id * (1 + (timetable.earliest_depart_time / id))))
+        .min_by(|a, b| (a.1).cmp(&b.1))
+        .unwrap()
 }
 
 impl Timetable {
@@ -38,6 +43,6 @@ mod tests {
     fn test_() {
         let data = create_factory();
 
-        assert_eq!(super::find_earliest(&data), (944, 59));
+        assert_eq!(super::find_earliest(&data), (59, 944));
     }
 }
