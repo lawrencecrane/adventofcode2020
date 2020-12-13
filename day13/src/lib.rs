@@ -22,7 +22,7 @@ impl Timetable {
                     match id.parse::<usize>() {
                         Ok(id) => {
                             schedules.push(Schedule { id, offset });
-                            (schedules, 0)
+                            (schedules, 1)
                         }
                         _ => (schedules, offset + 1),
                     }
