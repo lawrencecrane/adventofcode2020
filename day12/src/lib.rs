@@ -10,14 +10,25 @@ pub fn travel(instructions: &Vec<Instruction>) -> (isize, isize) {
                 Action::Left => (pos, dir * i),
                 Action::Right => (pos, dir * (-1 * i)),
                 Action::Forward => ((pos.0 + dir.re * x.value, pos.1 - dir.im * x.value), dir),
-                Action::North => ((pos.0, pos.1 - x.value), dir),
-                Action::South => ((pos.0, pos.1 + x.value), dir),
-                Action::East => ((pos.0 + x.value, pos.1), dir),
-                Action::West => ((pos.0 - x.value, pos.1), dir),
+                action => {
+                    let d = to_rotation(action);
+
+                    ((pos.0 + d.re * x.value, pos.1 - d.im * x.value), dir)
+                }
             }
         });
 
     position
+}
+
+fn to_rotation(action: Action) -> Complex<isize> {
+    match action {
+        Action::North => Complex::new(0, 1),
+        Action::South => Complex::new(0, -1),
+        Action::East => Complex::new(1, 0),
+        Action::West => Complex::new(-1, 0),
+        _ => Complex::new(0, 0),
+    }
 }
 
 pub fn to_instructions(x: &Vec<String>) -> Vec<Instruction> {
