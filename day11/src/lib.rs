@@ -10,13 +10,7 @@ pub fn simulate(layout: &Layout, nmax_adjacent: usize, max_adjacent_distance: is
 }
 
 fn _simulate(mut state: Layout, adjacent_map: AdjacentMap, nmax_adjacent: usize) -> Layout {
-    let changed: Vec<((isize, isize), Seat)> = state
-        .iter()
-        .filter_map(|(k, seat)| {
-            next_state(seat, &state, adjacent_map.get(k).unwrap(), nmax_adjacent)
-                .map(|seat| (*k, seat))
-        })
-        .collect();
+    let changed = changed_states(&state, &adjacent_map, &nmax_adjacent);
 
     match changed.len() {
         0 => state,
@@ -28,6 +22,20 @@ fn _simulate(mut state: Layout, adjacent_map: AdjacentMap, nmax_adjacent: usize)
             _simulate(state, adjacent_map, nmax_adjacent)
         }
     }
+}
+
+fn changed_states(
+    state: &Layout,
+    adjacent_map: &AdjacentMap,
+    nmax_adjacent: &usize,
+) -> Vec<((isize, isize), Seat)> {
+    state
+        .iter()
+        .filter_map(|(k, seat)| {
+            next_state(seat, &state, adjacent_map.get(k).unwrap(), *nmax_adjacent)
+                .map(|seat| (*k, seat))
+        })
+        .collect()
 }
 
 // Returns seat only if its state has changed
