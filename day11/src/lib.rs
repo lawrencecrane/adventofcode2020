@@ -63,7 +63,7 @@ fn adjacent_seats(layout: &Layout, max_distance: isize) -> AdjacentMap {
             (HashMap::new(), HashMap::new()),
             |(mut adjacent_map, mut pulses), (ij, direction)| {
                 if let Some(previous) =
-                    pulses.insert((*direction, get_pulse_id(ij, direction)), *ij)
+                    pulses.insert((*direction, get_pulse_rank(ij, direction)), *ij)
                 {
                     if is_in_range(&previous, ij, &max_distance) {
                         adjacent_map.mutually_insert(previous, *ij);
@@ -87,7 +87,14 @@ fn delta(origin: &(isize, isize), point: &(isize, isize)) -> (isize, isize) {
     ((point.0 - origin.0).abs(), (point.1 - origin.1).abs())
 }
 
-fn get_pulse_id(ij: &(isize, isize), direction: &PulseDirection) -> isize {
+// * Rank for rows and columns is i and j, respectively.
+//
+// * Diagonals are ranked with zero at the top-left corner.
+// * Rank increases to the right, decreases to the left (from -Inf to Inf).
+//
+// * Thus (i, j)'s diagonal ranks can be deduced by adding or substracting its
+// * row and column indices for leftward and rightward diagonals, respectively.
+fn get_pulse_rank(ij: &(isize, isize), direction: &PulseDirection) -> isize {
     match direction {
         PulseDirection::ViaDiagonalLeftward => ij.0 + ij.1,
         PulseDirection::ViaDiagonalRightward => ij.0 - ij.1,
