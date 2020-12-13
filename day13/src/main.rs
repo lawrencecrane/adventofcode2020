@@ -6,7 +6,7 @@ use lib::*;
 
 fn main() {
     let timetable = Timetable::parse(
-        read_lines("../data/13_input")
+        &read_lines("../data/13_input")
             .unwrap()
             .map(|s| s.unwrap().parse().unwrap())
             .collect(),
@@ -18,4 +18,6 @@ fn main() {
         "PART 1 | {}",
         earliest.0 * (earliest.1 - timetable.earliest_depart_time)
     );
+
+    println!("PART 2 | {:?}", timetable.schedules);
 }
