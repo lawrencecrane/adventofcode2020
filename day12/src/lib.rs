@@ -1,3 +1,7 @@
+pub fn travel(instructions: &Vec<Instruction>) -> (isize, isize) {
+    (0, 0)
+}
+
 pub fn to_instructions(x: &Vec<String>) -> Vec<Instruction> {
     x.iter().filter_map(Instruction::from_string).collect()
 }
@@ -60,5 +64,7 @@ mod tests {
     }
 
     #[test]
-    fn test_() {}
+    fn test_travel() {
+        assert_eq!(super::travel(&create_factory()), (17, 8));
+    }
 }

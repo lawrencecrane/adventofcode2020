@@ -12,5 +12,5 @@ fn main() {
             .collect(),
     );
 
-    println!("{:?}", instructions);
+    println!("PART 1 | {:?}", travel(&instructions));
 }
