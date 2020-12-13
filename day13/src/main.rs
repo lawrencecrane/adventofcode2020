@@ -12,5 +12,10 @@ fn main() {
             .collect(),
     );
 
-    println!("{:?}", find_earliest(&timetable));
+    let earliest = find_earliest(&timetable);
+
+    println!(
+        "PART 1 | {}",
+        earliest.0 * (earliest.1 - timetable.earliest_depart_time)
+    );
 }

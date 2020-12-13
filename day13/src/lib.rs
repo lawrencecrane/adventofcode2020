@@ -24,7 +24,7 @@ impl Timetable {
 
 #[derive(Debug, Clone)]
 pub struct Timetable {
-    earliest_depart_time: usize,
+    pub earliest_depart_time: usize,
     bus_ids: Vec<usize>,
 }
 
