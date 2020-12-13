@@ -1,7 +1,14 @@
 use std::iter::Iterator;
 
-pub fn find_earliest_matching_departures(schedules: &Vec<Schedule>) -> isize {
-    0
+pub fn find_earliest_matching_departures(schedules: &Vec<Schedule>) -> usize {
+    (1..std::usize::MAX)
+        .filter(|x| {
+            schedules
+                .iter()
+                .all(|schedule| (x + schedule.offset) % schedule.id == 0)
+        })
+        .take(1)
+        .collect::<Vec<usize>>()[0]
 }
 
 pub fn find_earliest(timetable: &Timetable) -> (usize, usize) {
