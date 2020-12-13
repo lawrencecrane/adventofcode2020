@@ -1,6 +1,6 @@
 use std::iter::Iterator;
 
-pub fn find_earliest_matching_departures(schedules: &Vec<Schedule>) -> usize {
+pub fn find_earliest_matching_departures(schedules: &Vec<Schedule>) -> isize {
     0
 }
 
@@ -15,18 +15,15 @@ pub fn find_earliest(timetable: &Timetable) -> (usize, usize) {
 
 impl Timetable {
     pub fn parse(data: &Vec<String>) -> Self {
-        let (schedules, _) =
-            data[1]
-                .split(',')
-                .fold((Vec::new(), 0), |(mut schedules, offset), id| {
-                    match id.parse::<usize>() {
-                        Ok(id) => {
-                            schedules.push(Schedule { id, offset });
-                            (schedules, 1)
-                        }
-                        _ => (schedules, offset + 1),
-                    }
-                });
+        let schedules = data[1]
+            .split(',')
+            .enumerate()
+            .filter(|(_, c)| c != &"x")
+            .map(|(offset, id)| Schedule {
+                id: id.parse().unwrap(),
+                offset,
+            })
+            .collect();
 
         Self {
             earliest_depart_time: data[0].parse().unwrap(),
