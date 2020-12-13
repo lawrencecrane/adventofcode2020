@@ -41,8 +41,6 @@ mod tests {
 
     #[test]
     fn test_() {
-        let data = create_factory();
-
-        assert_eq!(super::find_earliest(&data), (59, 944));
+        assert_eq!(super::find_earliest(&create_factory()), (59, 944));
     }
 }
