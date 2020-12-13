@@ -9,30 +9,35 @@ pub fn simulate(layout: &Layout, nmax_adjacent: usize, max_adjacent_distance: is
     )
 }
 
-fn _simulate(previous: Layout, adjacent_map: AdjacentMap, nmax_adjacent: usize) -> Layout {
-    let next: Layout = previous
+fn _simulate(mut state: Layout, adjacent_map: AdjacentMap, nmax_adjacent: usize) -> Layout {
+    let changed: Vec<((isize, isize), Seat)> = state
         .iter()
-        .map(|(k, seat)| {
-            (
-                *k,
-                next_state(seat, &previous, adjacent_map.get(k).unwrap(), nmax_adjacent),
-            )
+        .filter_map(|(k, seat)| {
+            next_state(seat, &state, adjacent_map.get(k).unwrap(), nmax_adjacent)
+                .map(|seat| (*k, seat))
         })
         .collect();
 
-    match next == previous {
-        true => next,
-        false => _simulate(next, adjacent_map, nmax_adjacent),
+    match changed.len() {
+        0 => state,
+        _ => {
+            changed.iter().for_each(|(ij, seat)| {
+                state.insert(*ij, *seat);
+            });
+
+            _simulate(state, adjacent_map, nmax_adjacent)
+        }
     }
 }
 
+// Returns seat only if its state has changed
 fn next_state(
     seat: &Seat,
     layout: &Layout,
     adjacent: &HashSet<(isize, isize)>,
     nmax_adjacent: usize,
-) -> Seat {
-    match adjacent
+) -> Option<Seat> {
+    let new_state = match adjacent
         .iter()
         .filter(|(x, y)| layout.get(&(*x, *y)).unwrap() == &Seat::OCCUPIED)
         .count()
@@ -40,6 +45,11 @@ fn next_state(
         0 => Seat::OCCUPIED,
         n if n >= nmax_adjacent => Seat::EMPTY,
         _ => *seat,
+    };
+
+    match new_state == *seat {
+        true => None,
+        false => Some(new_state),
     }
 }
 
