@@ -2,13 +2,14 @@ use num_complex::Complex;
 
 pub fn travel(instructions: &Vec<Instruction>) -> (isize, isize) {
     let i = Complex::new(0, 1);
+    let minus_i = Complex::new(0, -1);
 
     let (position, _) = instructions
         .iter()
         .fold(((0, 0), Complex::new(1, 0)), |(pos, dir), x| {
             match x.action {
-                Action::Left => (pos, dir * i),
-                Action::Right => (pos, dir * (-1 * i)),
+                Action::Left => (pos, dir * i.powi((x.value / 90) as i32)),
+                Action::Right => (pos, dir * (minus_i.powi((x.value / 90) as i32))),
                 Action::Forward => ((pos.0 + dir.re * x.value, pos.1 - dir.im * x.value), dir),
                 action => {
                     let d = to_rotation(action);

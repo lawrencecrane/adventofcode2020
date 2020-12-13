@@ -12,5 +12,7 @@ fn main() {
             .collect(),
     );
 
-    println!("PART 1 | {:?}", travel(&instructions));
+    let endpoint = travel(&instructions);
+
+    println!("PART 1 | {}", endpoint.0.abs() + endpoint.1.abs());
 }
