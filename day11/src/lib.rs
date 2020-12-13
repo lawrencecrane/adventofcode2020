@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 
 pub fn simulate(layout: &Layout, nmax_adjacent: usize, max_adjacent_distance: isize) -> Layout {
@@ -42,78 +43,72 @@ fn next_state(
     }
 }
 
-// We only need to find right, bottom, and downward diagonal points while iterating over points
-// as we "mutually insert" these points. Thus left, top, upward diagonals are generated at the same time
-// I.e. (0, 0)'s downward diagonal is (1, 1), we do not need to search (1, 1)'s upward diagonal as it has to be (0, 0)
+// We only need to find right, bottom, and downward diagonal points while iterating
+// over points from left to right, top to bottom, as we then can "mutually insert"
+// these points. Thus left, top, upward diagonals are generated at the same time.
+//
+// I.e. (0, 0)'s downward diagonal is (1, 1), we do not need to search (1, 1)'s
+// upward diagonal as it has to be (0, 0).
+//
+// In addition, we can create "pulses" from originating points to those four
+// directions, and give them unique id calculated from cell's indices. Then
+// store that pulse with its originating point, so that some later cell can
+// find it and "answer" to it by "mutually inserting".
 fn adjacent_seats(layout: &Layout, max_distance: isize) -> AdjacentMap {
-    let points = layout.keys().collect::<Vec<&(isize, isize)>>();
+    let mut points = layout.keys().collect::<Vec<&(isize, isize)>>();
 
-    points.iter().fold(HashMap::new(), |mut m, point| {
-        let is_valid = |p: &&&(isize, isize)| *p != point && is_in_range(point, p, &max_distance);
-        let closest = |x, y| delta(point, x).cmp(&delta(point, y));
+    points.sort();
 
-        // TODO: There has to be better way to find right, bottom, and downward diagonal points!
+    let (adjacent_map, _) = points.iter().cartesian_product(PULSES.iter()).fold(
+        (HashMap::new(), HashMap::new()),
+        |(mut adjacent_map, mut pulses), (ij, direction)| {
+            let id = get_pulse_id(ij, direction);
 
-        if let Some(right) = points
-            .iter()
-            .filter(is_valid)
-            .filter(|(x, y)| x == &point.0 && y > &point.1)
-            .min_by(|a, b| closest(a, b))
-        {
-            m.mutually_insert(**point, **right);
-        }
+            if let Some(previous) = pulses.insert((*direction, id), **ij) {
+                if is_in_range(&previous, ij, &max_distance) {
+                    adjacent_map.mutually_insert(previous, **ij);
+                }
+            }
 
-        if let Some(bottom) = points
-            .iter()
-            .filter(is_valid)
-            .filter(|(x, y)| y == &point.1 && x > &point.0)
-            .min_by(|a, b| closest(a, b))
-        {
-            m.mutually_insert(**point, **bottom);
-        }
+            (adjacent_map, pulses)
+        },
+    );
 
-        if let Some(br_diag) = points
-            .iter()
-            .filter(is_valid)
-            .filter(|p| is_diagonal(point, p, |xd, yd| yd > 0 && xd > 0))
-            .min_by(|a, b| closest(a, b))
-        {
-            m.mutually_insert(**point, **br_diag);
-        }
-
-        if let Some(bl_diag) = points
-            .iter()
-            .filter(is_valid)
-            .filter(|p| is_diagonal(point, p, |xd, yd| yd > 0 && xd < 0))
-            .min_by(|a, b| closest(a, b))
-        {
-            m.mutually_insert(**point, **bl_diag);
-        }
-
-        m
-    })
-}
-
-/// # Arguments
-/// * `f` - delta x (b.0 - a.0) and delta y (b.1 - a.1) will be passed as arguments
-///         can be used to further check which diagonal the vector is in
-fn is_diagonal<F>(a: &(isize, isize), b: &(isize, isize), f: F) -> bool
-where
-    F: Fn(isize, isize) -> bool,
-{
-    let yd = b.1 - a.1;
-    let xd = b.0 - a.0;
-
-    yd.abs() == xd.abs() && f(xd, yd)
+    adjacent_map
 }
 
 fn is_in_range(origin: &(isize, isize), point: &(isize, isize), max_distance: &isize) -> bool {
     let (xd, yd) = delta(origin, point);
+
     xd <= *max_distance && yd <= *max_distance
 }
 
 fn delta(origin: &(isize, isize), point: &(isize, isize)) -> (isize, isize) {
     ((point.0 - origin.0).abs(), (point.1 - origin.1).abs())
+}
+
+fn get_pulse_id(ij: &(isize, isize), direction: &PulseDirection) -> isize {
+    match direction {
+        PulseDirection::ViaDiagonalLeftward => ij.0 + ij.1,
+        PulseDirection::ViaDiagonalRightward => ij.0 - ij.1,
+        PulseDirection::Rightward => ij.0,
+        PulseDirection::Downward => ij.1,
+    }
+}
+
+const PULSES: [PulseDirection; 4] = [
+    PulseDirection::Rightward,
+    PulseDirection::Downward,
+    PulseDirection::ViaDiagonalRightward,
+    PulseDirection::ViaDiagonalLeftward,
+];
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+enum PulseDirection {
+    Rightward,
+    Downward,
+    ViaDiagonalRightward,
+    ViaDiagonalLeftward,
 }
 
 trait MutuallyInsert {
