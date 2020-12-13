@@ -1,7 +1,37 @@
 use num_complex::Complex;
 
 pub fn travel_with_waypoint(instructions: &Vec<Instruction>) -> (isize, isize) {
-    (0, 0)
+    let (position, _) = instructions
+        .iter()
+        .fold(((0, 0), (10, -1)), |(ship, waypoint), x| match x.action {
+            Action::Forward => (
+                (ship.0 + x.value * waypoint.0, ship.1 + x.value * waypoint.1),
+                waypoint,
+            ),
+            Action::Left | Action::Right => {
+                let rotation = match if x.action == Action::Left {
+                    360 - x.value
+                } else {
+                    x.value
+                } {
+                    90 => CLOCKWISE_90_DEG,
+                    180 => CLOCKWISE_180_DEG,
+                    _ => CLOCKWISE_270_DEG,
+                };
+
+                (ship, rotate(waypoint, rotation))
+            }
+            action => {
+                let dir = to_rotation(action);
+
+                (
+                    ship,
+                    (waypoint.0 + dir.re * x.value, waypoint.1 - dir.im * x.value),
+                )
+            }
+        });
+
+    position
 }
 
 pub fn travel(instructions: &Vec<Instruction>) -> (isize, isize) {
@@ -13,7 +43,7 @@ pub fn travel(instructions: &Vec<Instruction>) -> (isize, isize) {
         .fold(((0, 0), Complex::new(1, 0)), |(pos, dir), x| {
             match x.action {
                 Action::Left => (pos, dir * i.powi((x.value / 90) as i32)),
-                Action::Right => (pos, dir * (minus_i.powi((x.value / 90) as i32))),
+                Action::Right => (pos, dir * minus_i.powi((x.value / 90) as i32)),
                 action => {
                     let d = match action {
                         Action::Forward => dir,
@@ -26,6 +56,17 @@ pub fn travel(instructions: &Vec<Instruction>) -> (isize, isize) {
         });
 
     position
+}
+
+const CLOCKWISE_90_DEG: [[isize; 2]; 2] = [[0, -1], [1, 0]];
+const CLOCKWISE_180_DEG: [[isize; 2]; 2] = [[-1, 0], [0, -1]];
+const CLOCKWISE_270_DEG: [[isize; 2]; 2] = [[0, 1], [-1, 0]];
+
+fn rotate(vector: (isize, isize), mat: [[isize; 2]; 2]) -> (isize, isize) {
+    (
+        vector.0 * mat[0][0] + vector.1 * mat[0][1],
+        vector.0 * mat[1][0] + vector.1 * mat[1][1],
+    )
 }
 
 fn to_rotation(action: Action) -> Complex<isize> {
