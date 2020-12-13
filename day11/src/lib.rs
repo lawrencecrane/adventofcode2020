@@ -55,24 +55,24 @@ fn next_state(
 // store that pulse with its originating point, so that some later cell can
 // find it and "answer" to it by "mutually inserting".
 fn adjacent_seats(layout: &Layout, max_distance: isize) -> AdjacentMap {
-    let mut points = layout.keys().collect::<Vec<&(isize, isize)>>();
-
-    points.sort();
-
-    let (adjacent_map, _) = points.iter().cartesian_product(PULSES.iter()).fold(
-        (HashMap::new(), HashMap::new()),
-        |(mut adjacent_map, mut pulses), (ij, direction)| {
-            let id = get_pulse_id(ij, direction);
-
-            if let Some(previous) = pulses.insert((*direction, id), **ij) {
-                if is_in_range(&previous, ij, &max_distance) {
-                    adjacent_map.mutually_insert(previous, **ij);
+    let (adjacent_map, _) = layout
+        .keys()
+        .sorted()
+        .cartesian_product(PULSES.iter())
+        .fold(
+            (HashMap::new(), HashMap::new()),
+            |(mut adjacent_map, mut pulses), (ij, direction)| {
+                if let Some(previous) =
+                    pulses.insert((*direction, get_pulse_id(ij, direction)), *ij)
+                {
+                    if is_in_range(&previous, ij, &max_distance) {
+                        adjacent_map.mutually_insert(previous, *ij);
+                    }
                 }
-            }
 
-            (adjacent_map, pulses)
-        },
-    );
+                (adjacent_map, pulses)
+            },
+        );
 
     adjacent_map
 }
