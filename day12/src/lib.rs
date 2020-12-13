@@ -16,7 +16,8 @@ pub fn travel_with_waypoint(instructions: &Vec<Instruction>) -> (isize, isize) {
                 } {
                     90 => CLOCKWISE_90_DEG,
                     180 => CLOCKWISE_180_DEG,
-                    _ => CLOCKWISE_270_DEG,
+                    270 => CLOCKWISE_270_DEG,
+                    r => panic!("Unexpected rotation, got {} expected: 90, 180, 270", r),
                 };
 
                 (ship, rotate(waypoint, rotation))
