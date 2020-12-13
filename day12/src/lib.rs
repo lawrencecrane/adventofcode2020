@@ -25,13 +25,13 @@ pub struct Instruction {
 impl Action {
     fn from_char(x: char) -> Option<Self> {
         match x {
-            'N' => Some(Action::N),
-            'S' => Some(Action::S),
-            'E' => Some(Action::E),
-            'W' => Some(Action::W),
-            'L' => Some(Action::L),
-            'R' => Some(Action::R),
-            'F' => Some(Action::F),
+            'N' => Some(Action::North),
+            'S' => Some(Action::South),
+            'E' => Some(Action::East),
+            'W' => Some(Action::West),
+            'L' => Some(Action::Left),
+            'R' => Some(Action::Right),
+            'F' => Some(Action::Forward),
             _ => None,
         }
     }
@@ -39,13 +39,13 @@ impl Action {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Action {
-    N,
-    S,
-    E,
-    W,
-    L,
-    R,
-    F,
+    North,
+    South,
+    East,
+    West,
+    Left,
+    Right,
+    Forward,
 }
 
 #[cfg(test)]
