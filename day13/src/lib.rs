@@ -1,5 +1,9 @@
 use std::iter::Iterator;
 
+pub fn find_earliest_matching_departures(schedules: &Vec<Schedule>) -> usize {
+    0
+}
+
 pub fn find_earliest(timetable: &Timetable) -> (usize, usize) {
     timetable
         .schedules
@@ -54,8 +58,60 @@ mod tests {
         )
     }
 
+    fn create_factory_from(ids: &str) -> Vec<super::Schedule> {
+        super::Timetable::parse(&vec!["0", ids].iter().map(|s| s.to_string()).collect()).schedules
+    }
+
     #[test]
     fn test_find_earliest() {
         assert_eq!(super::find_earliest(&create_factory()), (59, 944));
+    }
+
+    #[test]
+    fn test_find_earliest_matching_departures_1() {
+        assert_eq!(
+            super::find_earliest_matching_departures(&create_factory().schedules),
+            1068781
+        );
+    }
+
+    #[test]
+    fn test_find_earliest_matching_departures_2() {
+        assert_eq!(
+            super::find_earliest_matching_departures(&create_factory_from("17,x,13,19")),
+            3417
+        );
+    }
+
+    #[test]
+    fn test_find_earliest_matching_departures_3() {
+        assert_eq!(
+            super::find_earliest_matching_departures(&create_factory_from("67,7,59,61")),
+            754018
+        );
+    }
+
+    #[test]
+    fn test_find_earliest_matching_departures_4() {
+        assert_eq!(
+            super::find_earliest_matching_departures(&create_factory_from("67,x,7,59,61")),
+            779210
+        );
+    }
+
+    #[test]
+    fn test_find_earliest_matching_departures_5() {
+        assert_eq!(
+            super::find_earliest_matching_departures(&create_factory_from("67,7,x,59,61")),
+            1261476
+        );
+    }
+
+    #[test]
+    fn test_find_earliest_matching_departures_6() {
+        assert_eq!(
+            super::find_earliest_matching_departures(&create_factory_from("1789,37,47,1889")),
+            1202161486
+        );
     }
 }

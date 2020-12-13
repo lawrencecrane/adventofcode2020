@@ -19,5 +19,8 @@ fn main() {
         earliest.0 * (earliest.1 - timetable.earliest_depart_time)
     );
 
-    println!("PART 2 | {:?}", timetable.schedules);
+    println!(
+        "PART 2 | {}",
+        find_earliest_matching_departures(&timetable.schedules)
+    );
 }
