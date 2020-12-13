@@ -10,9 +10,11 @@ pub fn travel(instructions: &Vec<Instruction>) -> (isize, isize) {
             match x.action {
                 Action::Left => (pos, dir * i.powi((x.value / 90) as i32)),
                 Action::Right => (pos, dir * (minus_i.powi((x.value / 90) as i32))),
-                Action::Forward => ((pos.0 + dir.re * x.value, pos.1 - dir.im * x.value), dir),
                 action => {
-                    let d = to_rotation(action);
+                    let d = match action {
+                        Action::Forward => dir,
+                        _ => to_rotation(action),
+                    };
 
                     ((pos.0 + d.re * x.value, pos.1 - d.im * x.value), dir)
                 }
