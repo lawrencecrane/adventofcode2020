@@ -5,7 +5,7 @@ mod lib;
 use lib::*;
 
 fn main() {
-    let timetable = parse(
+    let timetable = Timetable::parse(
         read_lines("../data/13_input")
             .unwrap()
             .map(|s| s.unwrap().parse().unwrap())

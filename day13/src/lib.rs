@@ -1,15 +1,19 @@
+use std::iter::Iterator;
+
 pub fn find_earliest(timetable: &Timetable) -> (usize, usize) {
     (0, 0)
 }
 
-pub fn parse(data: Vec<String>) -> Timetable {
-    Timetable {
-        earliest_depart_time: data[0].parse().unwrap(),
-        bus_ids: data[1]
-            .split(',')
-            .filter(|x| x != &"x")
-            .map(|x| x.parse::<usize>().unwrap())
-            .collect(),
+impl Timetable {
+    pub fn parse(data: Vec<String>) -> Self {
+        Self {
+            earliest_depart_time: data[0].parse().unwrap(),
+            bus_ids: data[1]
+                .split(',')
+                .filter(|x| x != &"x")
+                .map(|x| x.parse::<usize>().unwrap())
+                .collect(),
+        }
     }
 }
 
@@ -22,7 +26,7 @@ pub struct Timetable {
 #[cfg(test)]
 mod tests {
     fn create_factory() -> super::Timetable {
-        super::parse(
+        super::Timetable::parse(
             vec!["939", "7,13,x,x,59,x,31,19"]
                 .iter()
                 .map(|s| s.to_string())
