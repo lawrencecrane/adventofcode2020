@@ -1,5 +1,9 @@
 use num_complex::Complex;
 
+pub fn travel_with_waypoint(instructions: &Vec<Instruction>) -> (isize, isize) {
+    (0, 0)
+}
+
 pub fn travel(instructions: &Vec<Instruction>) -> (isize, isize) {
     let i = Complex::new(0, 1);
     let minus_i = Complex::new(0, -1);
@@ -98,5 +102,10 @@ mod tests {
     #[test]
     fn test_travel() {
         assert_eq!(super::travel(&create_factory()), (17, 8));
+    }
+
+    #[test]
+    fn test_travel_with_waypoint() {
+        assert_eq!(super::travel_with_waypoint(&create_factory()), (214, 72));
     }
 }

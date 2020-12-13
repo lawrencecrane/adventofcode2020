@@ -12,7 +12,13 @@ fn main() {
             .collect(),
     );
 
-    let endpoint = travel(&instructions);
+    {
+        let endpoint = travel(&instructions);
+        println!("PART 1 | {}", endpoint.0.abs() + endpoint.1.abs());
+    }
 
-    println!("PART 1 | {}", endpoint.0.abs() + endpoint.1.abs());
+    {
+        let endpoint = travel_with_waypoint(&instructions);
+        println!("PART 2 | {}", endpoint.0.abs() + endpoint.1.abs());
+    }
 }
