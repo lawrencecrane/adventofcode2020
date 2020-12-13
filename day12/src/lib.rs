@@ -1,12 +1,21 @@
-pub fn travel(instructions: &Vec<Instruction>) -> (isize, isize) {
-    let (position, _) = instructions.iter().fold(
-        ((0, 0), Direction::East),
-        |(position, direction), instruction| {
-            1 + 1;
+use num_complex::Complex;
 
-            (position, direction)
-        },
-    );
+pub fn travel(instructions: &Vec<Instruction>) -> (isize, isize) {
+    let i = Complex::new(0, 1);
+
+    let (position, _) = instructions
+        .iter()
+        .fold(((0, 0), Complex::new(1, 0)), |(pos, dir), x| {
+            match x.action {
+                Action::Left => (pos, dir * i),
+                Action::Right => (pos, dir * (-1 * i)),
+                Action::Forward => ((pos.0 + dir.re * x.value, pos.1 - dir.im * x.value), dir),
+                Action::North => ((pos.0, pos.1 - x.value), dir),
+                Action::South => ((pos.0, pos.1 + x.value), dir),
+                Action::East => ((pos.0 + x.value, pos.1), dir),
+                Action::West => ((pos.0 - x.value, pos.1), dir),
+            }
+        });
 
     position
 }
@@ -21,7 +30,7 @@ impl Instruction {
 
         match (
             Action::from_char(chars.next().unwrap_or(' ')),
-            chars.collect::<String>().parse::<usize>(),
+            chars.collect::<String>().parse::<isize>(),
         ) {
             (Some(action), Ok(value)) => Some(Instruction { action, value }),
             _ => None,
@@ -32,16 +41,16 @@ impl Instruction {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Instruction {
     action: Action,
-    value: usize,
+    value: isize,
 }
 
 impl Action {
     fn from_char(x: char) -> Option<Self> {
         match x {
-            'N' => Some(Action::Base(Direction::North)),
-            'S' => Some(Action::Base(Direction::South)),
-            'E' => Some(Action::Base(Direction::East)),
-            'W' => Some(Action::Base(Direction::West)),
+            'N' => Some(Action::North),
+            'S' => Some(Action::South),
+            'E' => Some(Action::East),
+            'W' => Some(Action::West),
             'L' => Some(Action::Left),
             'R' => Some(Action::Right),
             'F' => Some(Action::Forward),
@@ -52,17 +61,13 @@ impl Action {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Action {
-    Base(Direction),
-    Left,
-    Right,
-    Forward,
-}
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Direction {
     North,
     South,
     East,
     West,
+    Left,
+    Right,
+    Forward,
 }
 
 #[cfg(test)]
