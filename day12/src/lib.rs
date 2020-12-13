@@ -58,6 +58,8 @@ pub fn travel(instructions: &Vec<Instruction>) -> (isize, isize) {
     position
 }
 
+// These are actually counter clockwise matrices for the labeled degrees,
+// but as the y axis is inverted in our coodrinate system these trasform to clockwise.
 const CLOCKWISE_90_DEG: [[isize; 2]; 2] = [[0, -1], [1, 0]];
 const CLOCKWISE_180_DEG: [[isize; 2]; 2] = [[-1, 0], [0, -1]];
 const CLOCKWISE_270_DEG: [[isize; 2]; 2] = [[0, 1], [-1, 0]];
