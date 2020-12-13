@@ -1,5 +1,14 @@
 pub fn travel(instructions: &Vec<Instruction>) -> (isize, isize) {
-    (0, 0)
+    let (position, _) = instructions.iter().fold(
+        ((0, 0), Direction::East),
+        |(position, direction), instruction| {
+            1 + 1;
+
+            (position, direction)
+        },
+    );
+
+    position
 }
 
 pub fn to_instructions(x: &Vec<String>) -> Vec<Instruction> {
@@ -29,10 +38,10 @@ pub struct Instruction {
 impl Action {
     fn from_char(x: char) -> Option<Self> {
         match x {
-            'N' => Some(Action::North),
-            'S' => Some(Action::South),
-            'E' => Some(Action::East),
-            'W' => Some(Action::West),
+            'N' => Some(Action::Base(Direction::North)),
+            'S' => Some(Action::Base(Direction::South)),
+            'E' => Some(Action::Base(Direction::East)),
+            'W' => Some(Action::Base(Direction::West)),
             'L' => Some(Action::Left),
             'R' => Some(Action::Right),
             'F' => Some(Action::Forward),
@@ -43,13 +52,17 @@ impl Action {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Action {
+    Base(Direction),
+    Left,
+    Right,
+    Forward,
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Direction {
     North,
     South,
     East,
     West,
-    Left,
-    Right,
-    Forward,
 }
 
 #[cfg(test)]
