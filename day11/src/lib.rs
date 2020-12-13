@@ -166,9 +166,9 @@ pub enum Seat {
     OCCUPIED,
 }
 
-#[cfg(test)]
-mod tests {
-    fn create_factory() -> super::Layout {
+pub mod data {
+    #[allow(dead_code)]
+    pub fn create_factory() -> super::Layout {
         super::to_layout(
             &vec![
                 "L.LL.LL.LL",
@@ -187,6 +187,11 @@ mod tests {
             .collect(),
         )
     }
+}
+
+#[cfg(test)]
+pub mod tests {
+    use super::data::create_factory;
 
     #[test]
     fn test_simulate() {
