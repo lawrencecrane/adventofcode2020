@@ -77,16 +77,19 @@ pub fn to_program(raw: Vec<String>) -> Program {
             match (s.next(), s.next()) {
                 (Some(a), Some(b)) if a.starts_with("mask") => Some(Instruction::Mask(to_mask(b))),
                 (Some(a), Some(b)) if a.starts_with("mem[") => {
-                    Some(Instruction::Assignment(Assignment {
-                        value: b.parse().unwrap(),
-                        address: a.replace("mem[", "").replace("]", "").parse().unwrap(),
-                    }))
+                    Some(Instruction::Assignment(to_assignment((a, b))))
                 }
-
                 _ => None,
             }
         })
         .collect()
+}
+
+fn to_assignment(raw: (&str, &str)) -> Assignment {
+    Assignment {
+        address: raw.0.replace("mem[", "").replace("]", "").parse().unwrap(),
+        value: raw.1.parse().unwrap(),
+    }
 }
 
 fn to_mask(raw: &str) -> Mask {
