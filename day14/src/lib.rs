@@ -36,13 +36,6 @@ pub fn decoder_v1(memory: &mut HashMap<usize, usize>, mask: &Mask, assignment: &
 
 fn apply_mask_v2(mask: &Mask, n: usize) -> Vec<usize> {
     mask.iter().fold(vec![n], |mut values, bit| match bit.flag {
-        Flag::Schrodinger => values
-            .iter()
-            .flat_map(|x| match kth_bit_is_set(*x, bit.kth) {
-                true => vec![*x, *x - bit.value],
-                false => vec![*x, *x + bit.value],
-            })
-            .collect(),
         Flag::One => {
             values
                 .iter_mut()
@@ -51,6 +44,13 @@ fn apply_mask_v2(mask: &Mask, n: usize) -> Vec<usize> {
 
             values
         }
+        Flag::Schrodinger => values
+            .iter()
+            .flat_map(|x| match kth_bit_is_set(*x, bit.kth) {
+                true => vec![*x, *x - bit.value],
+                false => vec![*x, *x + bit.value],
+            })
+            .collect(),
         _ => values,
     })
 }
