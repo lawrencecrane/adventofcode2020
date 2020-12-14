@@ -12,5 +12,5 @@ fn main() {
             .collect(),
     );
 
-    println!("PART 1 | {}", run(&program));
+    println!("PART 1 | {}", run(&program, decoder_v1));
 }

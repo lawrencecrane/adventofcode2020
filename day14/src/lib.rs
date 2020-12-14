@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-pub fn run(program: &Program) -> usize {
+pub fn run<F>(program: &Program, decoder: F) -> usize
+where
+    F: Fn(&mut HashMap<usize, usize>, &Mask, &Assignment) -> (),
+{
     let (memory, _) =
         program
             .iter()
@@ -9,10 +12,7 @@ pub fn run(program: &Program) -> usize {
                 |(mut memory, mask), instruction| match instruction {
                     (Some(new_mask), _) => (memory, Some(new_mask)),
                     (_, Some(assignment)) => {
-                        memory.insert(
-                            assignment.address,
-                            apply_mask(mask.unwrap(), assignment.value),
-                        );
+                        decoder(&mut memory, mask.unwrap(), assignment);
 
                         (memory, mask)
                     }
@@ -21,6 +21,10 @@ pub fn run(program: &Program) -> usize {
             );
 
     memory.values().sum()
+}
+
+pub fn decoder_v1(memory: &mut HashMap<usize, usize>, mask: &Mask, assignment: &Assignment) {
+    memory.insert(assignment.address, apply_mask_v1(mask, assignment.value));
 }
 
 fn apply_mask_v2(mask: &Mask, n: usize) -> Vec<usize> {
@@ -46,7 +50,7 @@ fn apply_mask_v2(mask: &Mask, n: usize) -> Vec<usize> {
         })
 }
 
-fn apply_mask(mask: &Mask, n: usize) -> usize {
+fn apply_mask_v1(mask: &Mask, n: usize) -> usize {
     mask.iter().fold(n, |value, bit| {
         match (bit.flag, kth_bit_is_set(n, bit.kth)) {
             (Flag::One, false) => value + bit.value,
@@ -140,7 +144,7 @@ mod tests {
 
     #[test]
     fn test_run() {
-        assert_eq!(super::run(&create_factory()), 165);
+        assert_eq!(super::run(&create_factory(), super::decoder_v1), 165);
     }
 
     #[test]
@@ -150,13 +154,13 @@ mod tests {
     }
 
     #[test]
-    fn test_apply_mask() {
+    fn test_apply_mask_v1() {
         let factory = create_factory();
         let (fst, _) = factory.first().unwrap();
         let mask = fst.to_owned().unwrap();
 
-        assert_eq!(super::apply_mask(&mask, 11), 73);
-        assert_eq!(super::apply_mask(&mask, 101), 101);
-        assert_eq!(super::apply_mask(&mask, 0), 64);
+        assert_eq!(super::apply_mask_v1(&mask, 11), 73);
+        assert_eq!(super::apply_mask_v1(&mask, 101), 101);
+        assert_eq!(super::apply_mask_v1(&mask, 0), 64);
     }
 }
