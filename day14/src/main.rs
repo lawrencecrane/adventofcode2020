@@ -13,4 +13,5 @@ fn main() {
     );
 
     println!("PART 1 | {}", run(&program, decoder_v1));
+    println!("PART 2 | {}", run(&program, decoder_v2));
 }
