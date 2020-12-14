@@ -1,7 +1,12 @@
-use std::iter::Iterator;
+use aoc_utils::range::Range;
 
 pub fn find_earliest_matching_departures(schedules: &Vec<Schedule>) -> usize {
-    (1..std::usize::MAX)
+    let max = schedules.iter().max_by(|a, b| a.id.cmp(&b.id)).unwrap();
+
+    Range { step: max.id }
+        .into_iter()
+        .filter(|x| x > &0)
+        .map(|x| x - max.offset)
         .filter(|x| {
             schedules
                 .iter()

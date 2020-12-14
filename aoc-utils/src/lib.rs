@@ -3,6 +3,7 @@ use std::io::{self, BufRead};
 use std::path::Path;
 
 pub mod iterator;
+pub mod range;
 pub mod tribonacci;
 
 pub fn to_number(x: std::result::Result<String, std::io::Error>) -> u32 {
