@@ -1,5 +1,6 @@
 use aoc_utils::range::Range;
 
+// TODO: Still almost bruteforce way, and will not be able to solve PART 2 actually
 pub fn find_earliest_matching_departures(schedules: &Vec<Schedule>) -> usize {
     let max = schedules.iter().max_by(|a, b| a.id.cmp(&b.id)).unwrap();
 
