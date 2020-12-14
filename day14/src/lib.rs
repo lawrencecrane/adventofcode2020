@@ -25,9 +25,9 @@ pub fn run(program: &Program) -> usize {
 
 fn apply_mask(mask: &Mask, n: usize) -> usize {
     mask.iter().fold(n, |value, bit| {
-        match (bit.is_set, kth_bit_is_set(n, bit.kth)) {
-            (true, false) => value + bit.value,
-            (false, true) => value - bit.value,
+        match (bit.flag, kth_bit_is_set(n, bit.kth)) {
+            (Flag::One, false) => value + bit.value,
+            (Flag::Zero, true) => value - bit.value,
             _ => value,
         }
     })
@@ -61,13 +61,14 @@ fn to_mask(raw: &str) -> Mask {
     raw.chars()
         .rev()
         .enumerate()
-        .filter_map(|(i, bit)| match bit {
-            'X' => None,
-            _ => Some(MaskBit {
-                kth: i + 1,
-                value: (2 as usize).pow(i as u32),
-                is_set: bit == '1',
-            }),
+        .map(|(i, bit)| MaskBit {
+            kth: i + 1,
+            value: (2 as usize).pow(i as u32),
+            flag: match bit {
+                '1' => Flag::One,
+                '0' => Flag::Zero,
+                _ => Flag::Schrodinger,
+            },
         })
         .collect()
 }
@@ -88,7 +89,14 @@ type Mask = Vec<MaskBit>;
 pub struct MaskBit {
     kth: usize,
     value: usize,
-    is_set: bool,
+    flag: Flag,
+}
+
+#[derive(Debug, Clone, Copy)]
+enum Flag {
+    One,
+    Zero,
+    Schrodinger,
 }
 
 #[cfg(test)]
