@@ -23,6 +23,14 @@ where
     memory.values().sum()
 }
 
+pub fn decoder_v2(memory: &mut HashMap<usize, usize>, mask: &Mask, assignment: &Assignment) {
+    apply_mask_v2(mask, assignment.address)
+        .iter()
+        .for_each(|address| {
+            memory.insert(*address, assignment.value);
+        });
+}
+
 pub fn decoder_v1(memory: &mut HashMap<usize, usize>, mask: &Mask, assignment: &Assignment) {
     memory.insert(assignment.address, apply_mask_v1(mask, assignment.value));
 }
@@ -142,9 +150,28 @@ mod tests {
         )
     }
 
+    fn create_small_factory() -> super::Program {
+        super::to_program(
+            vec![
+                "mask = 000000000000000000000000000000X1001X",
+                "mem[42] = 100",
+                "mask = 00000000000000000000000000000000X0XX",
+                "mem[26] = 1",
+            ]
+            .iter()
+            .map(|s| s.to_string())
+            .collect(),
+        )
+    }
+
     #[test]
-    fn test_run() {
+    fn test_run_v1() {
         assert_eq!(super::run(&create_factory(), super::decoder_v1), 165);
+    }
+
+    #[test]
+    fn test_run_v2() {
+        assert_eq!(super::run(&create_small_factory(), super::decoder_v2), 208);
     }
 
     #[test]
