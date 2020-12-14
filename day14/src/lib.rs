@@ -10,13 +10,12 @@ where
             .fold(
                 (HashMap::new(), None),
                 |(mut memory, mask), instruction| match instruction {
-                    (Some(new_mask), _) => (memory, Some(new_mask)),
-                    (_, Some(assignment)) => {
+                    Instruction::Mask(new_mask) => (memory, Some(new_mask)),
+                    Instruction::Assignment(assignment) => {
                         decoder(&mut memory, mask.unwrap(), assignment);
 
                         (memory, mask)
                     }
-                    _ => (memory, mask),
                 },
             );
 
@@ -76,14 +75,14 @@ pub fn to_program(raw: Vec<String>) -> Program {
             let mut s = x.split(" = ");
 
             match (s.next(), s.next()) {
-                (Some(a), Some(b)) if a.starts_with("mask") => Some((Some(to_mask(b)), None)),
-                (Some(a), Some(b)) if a.starts_with("mem[") => Some((
-                    None,
-                    Some(Assignment {
+                (Some(a), Some(b)) if a.starts_with("mask") => Some(Instruction::Mask(to_mask(b))),
+                (Some(a), Some(b)) if a.starts_with("mem[") => {
+                    Some(Instruction::Assignment(Assignment {
                         value: b.parse().unwrap(),
                         address: a.replace("mem[", "").replace("]", "").parse().unwrap(),
-                    }),
-                )),
+                    }))
+                }
+
                 _ => None,
             }
         })
@@ -108,7 +107,10 @@ fn to_mask(raw: &str) -> Mask {
 
 type Program = Vec<Instruction>;
 
-type Instruction = (Option<Mask>, Option<Assignment>);
+pub enum Instruction {
+    Assignment(Assignment),
+    Mask(Mask),
+}
 
 #[derive(Debug, Clone, Copy)]
 pub struct Assignment {
@@ -170,22 +172,5 @@ mod tests {
     #[test]
     fn test_run_v2() {
         assert_eq!(super::run(&create_small_factory(), super::decoder_v2), 208);
-    }
-
-    #[test]
-    fn test_kth_bit_is_set() {
-        assert_eq!(super::kth_bit_is_set(0, 2), false);
-        assert_eq!(super::kth_bit_is_set(101, 2), false);
-    }
-
-    #[test]
-    fn test_apply_mask_v1() {
-        let factory = create_factory();
-        let (fst, _) = factory.first().unwrap();
-        let mask = fst.to_owned().unwrap();
-
-        assert_eq!(super::apply_mask_v1(&mask, 11), 73);
-        assert_eq!(super::apply_mask_v1(&mask, 101), 101);
-        assert_eq!(super::apply_mask_v1(&mask, 0), 64);
     }
 }
