@@ -80,7 +80,7 @@ type History = HashMap<usize, (Option<usize>, Option<usize>)>;
 mod tests {
 
     #[test]
-    fn test_play_memory_game() {
+    fn test_play_memory_game_2020th() {
         assert_eq!(super::play_memory_game(&vec![0, 3, 6], 2020), 436);
         assert_eq!(super::play_memory_game(&vec![1, 3, 2], 2020), 1);
         assert_eq!(super::play_memory_game(&vec![2, 1, 3], 2020), 10);
@@ -88,5 +88,16 @@ mod tests {
         assert_eq!(super::play_memory_game(&vec![2, 3, 1], 2020), 78);
         assert_eq!(super::play_memory_game(&vec![3, 2, 1], 2020), 438);
         assert_eq!(super::play_memory_game(&vec![3, 1, 2], 2020), 1836);
+    }
+
+    #[test]
+    fn test_play_memory_game_30000000th() {
+        assert_eq!(super::play_memory_game(&vec![0, 3, 6], 30000000), 175594);
+        assert_eq!(super::play_memory_game(&vec![1, 3, 2], 30000000), 2578);
+        assert_eq!(super::play_memory_game(&vec![2, 1, 3], 30000000), 3544142);
+        assert_eq!(super::play_memory_game(&vec![1, 2, 3], 30000000), 261214);
+        assert_eq!(super::play_memory_game(&vec![2, 3, 1], 30000000), 6895259);
+        assert_eq!(super::play_memory_game(&vec![3, 2, 1], 30000000), 18);
+        assert_eq!(super::play_memory_game(&vec![3, 1, 2], 30000000), 362);
     }
 }
