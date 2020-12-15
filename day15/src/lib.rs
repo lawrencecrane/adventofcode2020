@@ -1,20 +1,44 @@
 use std::collections::HashMap;
 
 pub fn play_memory_game(starting: &Vec<usize>, until: usize) -> usize {
-    let mut history = initialize_history(starting);
-
-    0
+    MemoryGame::new(starting)
+        .into_iter()
+        .take(until)
+        .last()
+        .unwrap_or(0)
 }
 
-fn initialize_history(starting: &Vec<usize>) -> HashMap<usize, (Option<usize>, Option<usize>)> {
-    let mut history: HashMap<usize, (Option<usize>, Option<usize>)> = HashMap::new();
+impl Iterator for MemoryGame {
+    type Item = usize;
 
-    starting.iter().enumerate().for_each(|(i, x)| {
-        history.insert(*x, (Some(i), None));
-    });
-
-    history
+    fn next(&mut self) -> Option<usize> {
+        None
+    }
 }
+
+impl MemoryGame {
+    fn new(starting: &Vec<usize>) -> Self {
+        Self {
+            history: MemoryGame::initialize_history(starting),
+        }
+    }
+
+    fn initialize_history(starting: &Vec<usize>) -> History {
+        let mut history: History = HashMap::new();
+
+        starting.iter().enumerate().for_each(|(i, x)| {
+            history.insert(*x, (Some(i), None));
+        });
+
+        history
+    }
+}
+
+struct MemoryGame {
+    history: History,
+}
+
+type History = HashMap<usize, (Option<usize>, Option<usize>)>;
 
 #[cfg(test)]
 mod tests {
