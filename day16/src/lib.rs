@@ -1,5 +1,9 @@
 use std::collections::HashMap;
 
+pub fn calculate_error(data: &TicketData) -> usize {
+    0
+}
+
 pub fn to_ticket_data(raw: &Vec<String>) -> TicketData {
     let is_not_empty = |x: &&String| x != &&"".to_string();
 
@@ -80,7 +84,7 @@ type Rule = (String, ((usize, usize), (usize, usize)));
 
 #[cfg(test)]
 mod tests {
-    use super::{to_ticket_data, TicketData};
+    use super::{calculate_error, to_ticket_data, TicketData};
 
     fn create_factory() -> TicketData {
         to_ticket_data(
@@ -102,5 +106,10 @@ mod tests {
             .map(|s| s.to_string())
             .collect(),
         )
+    }
+
+    #[test]
+    fn test_calculate_error() {
+        assert_eq!(calculate_error(&create_factory()), 71);
     }
 }
