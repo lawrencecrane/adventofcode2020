@@ -12,5 +12,5 @@ fn main() {
             .collect(),
     );
 
-    println!("{:?}", data);
+    println!("PART 1 | {}", calculate_error_rate(&data));
 }

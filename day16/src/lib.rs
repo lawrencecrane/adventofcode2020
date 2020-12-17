@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-pub fn calculate_error(data: &TicketData) -> usize {
+pub fn calculate_error_rate(data: &TicketData) -> usize {
     0
 }
 
@@ -109,7 +109,7 @@ mod tests {
     }
 
     #[test]
-    fn test_calculate_error() {
+    fn test_calculate_error_rate() {
         assert_eq!(calculate_error(&create_factory()), 71);
     }
 }
