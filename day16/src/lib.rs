@@ -1,7 +1,21 @@
 use std::collections::HashMap;
 
 pub fn calculate_error_rate(data: &TicketData) -> usize {
-    0
+    data.nearby
+        .iter()
+        .map(|ticket| {
+            ticket
+                .iter()
+                .filter(|field| !is_valid(*field, &data.rules))
+                .sum::<usize>()
+        })
+        .sum()
+}
+
+fn is_valid(field: &usize, rules: &Rules) -> bool {
+    rules
+        .values()
+        .any(|((a1, a2), (b1, b2))| (field >= a1 && field <= a2) || (field >= b1 && field <= b2))
 }
 
 pub fn to_ticket_data(raw: &Vec<String>) -> TicketData {
@@ -84,7 +98,7 @@ type Rule = (String, ((usize, usize), (usize, usize)));
 
 #[cfg(test)]
 mod tests {
-    use super::{calculate_error, to_ticket_data, TicketData};
+    use super::{calculate_error_rate, to_ticket_data, TicketData};
 
     fn create_factory() -> TicketData {
         to_ticket_data(
@@ -110,6 +124,6 @@ mod tests {
 
     #[test]
     fn test_calculate_error_rate() {
-        assert_eq!(calculate_error(&create_factory()), 71);
+        assert_eq!(calculate_error_rate(&create_factory()), 71);
     }
 }
